@@ -1,0 +1,446 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom theme for Teltonika Gateway Monitor */
+/* Following RayleighConnect design principles with industrial focus */
+
+:root {
+    /* Deep navy background for left rail navigation */
+    --sidebar-bg: #1e293b;
+    --sidebar-text: #f8fafc;
+    --sidebar-hover: #334155;
+    
+    /* White content areas */
+    --content-bg: #ffffff;
+    --content-text: #0f172a;
+    
+    /* Blue accent colors */
+    --accent-primary: #3b82f6;
+    --accent-secondary: #1d4ed8;
+    
+    /* WCAG AA compliant colors */
+    --success: #059669;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --info: #0284c7;
+}
+
+/* Enhanced focus indicators for WCAG AA compliance */
+.fi-btn:focus,
+.fi-input:focus,
+.fi-select:focus,
+.fi-ta:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus,
+[tabindex]:focus {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Skip to main content link for screen readers */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--accent-primary);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 9999;
+    font-weight: 600;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* High contrast focus indicators */
+@media (prefers-contrast: high) {
+    .fi-btn:focus,
+    .fi-input:focus,
+    .fi-select:focus,
+    .fi-ta:focus,
+    button:focus,
+    input:focus,
+    select:focus,
+    textarea:focus,
+    a:focus,
+    [tabindex]:focus {
+        outline: 4px solid #000000;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px #ffffff, 0 0 0 6px #000000;
+    }
+}
+
+/* Improved contrast for better readability */
+.fi-sidebar {
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+}
+
+.fi-sidebar-nav-item:hover {
+    background-color: var(--sidebar-hover);
+}
+
+/* Responsive design improvements with enhanced mobile support */
+@media (max-width: 475px) {
+    /* Extra small screens */
+    .fi-main {
+        padding: 0.75rem;
+    }
+    
+    .fi-dashboard-tiles {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .kpi-tile {
+        padding: 1rem;
+    }
+    
+    .gateway-status-card {
+        padding: 0.75rem;
+    }
+    
+    /* Compact table for mobile */
+    .fi-ta-table {
+        font-size: 0.75rem;
+    }
+    
+    .fi-ta-cell {
+        padding: 0.375rem;
+    }
+    
+    /* Stack filter controls vertically on mobile */
+    .filter-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+@media (min-width: 476px) and (max-width: 640px) {
+    /* Small screens */
+    .fi-main {
+        padding: 1rem;
+    }
+    
+    .fi-dashboard-tiles {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+    /* Medium screens */
+    .fi-dashboard-tiles {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .filter-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Large screens */
+    .fi-dashboard-tiles {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    /* Extra large screens */
+    .fi-dashboard-tiles {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --sidebar-bg: #000000;
+        --content-bg: #ffffff;
+        --accent-primary: #0000ff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Custom styles for industrial dashboard */
+.gateway-status-card {
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease-in-out;
+}
+
+.gateway-status-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-tile {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+
+/* Status indicators */
+.status-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.status-online {
+    background-color: var(--success);
+}
+
+.status-offline {
+    background-color: var(--danger);
+}
+
+.status-unknown {
+    background-color: #6b7280;
+}
+
+/* Sparkline charts */
+.sparkline-container {
+    height: 2rem;
+    width: 4rem;
+}
+
+/* Filter chips */
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+.filter-chip.active {
+    background-color: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+/* Data table enhancements */
+.fi-ta-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.fi-ta-header-cell {
+    position: sticky;
+    top: 0;
+    background-color: #f8fafc;
+    z-index: 10;
+}
+
+/* Mobile responsive tables */
+@media (max-width: 640px) {
+    .fi-ta-table {
+        font-size: 0.875rem;
+    }
+    
+    .fi-ta-cell {
+        padding: 0.5rem;
+    }
+}
+
+/* Loading states */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Toast notifications */
+.fi-no {
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty states */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.empty-state-icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 1rem;
+    opacity: 0.5;
+}
+
+/* Accessibility enhancements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Keyboard navigation improvements */
+.keyboard-focusable {
+    cursor: pointer;
+}
+
+.keyboard-focusable:focus {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* Interactive element states */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Status indicators with better contrast */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.status-indicator .status-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    border: 2px solid transparent;
+}
+
+/* High contrast status indicators */
+@media (prefers-contrast: high) {
+    .status-online .status-dot {
+        background-color: #000000;
+        border-color: #ffffff;
+    }
+    
+    .status-offline .status-dot {
+        background-color: #ffffff;
+        border-color: #000000;
+    }
+    
+    .status-unknown .status-dot {
+        background-color: #666666;
+        border-color: #ffffff;
+    }
+}
+
+/* Touch target improvements for mobile */
+@media (max-width: 768px) {
+    button,
+    .fi-btn,
+    a,
+    input[type="checkbox"],
+    input[type="radio"],
+    select {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .filter-chip {
+        min-height: 44px;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .fi-sidebar,
+    .fi-topbar,
+    button,
+    .fi-btn {
+        display: none !important;
+    }
+    
+    .fi-main {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .fi-ta-table {
+        border-collapse: collapse;
+    }
+    
+    .fi-ta-cell,
+    .fi-ta-header-cell {
+        border: 1px solid #000000;
+        padding: 0.25rem;
+    }
+}
+
+/* Dark mode accessibility improvements */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sidebar-bg: #0f172a;
+        --sidebar-text: #f1f5f9;
+        --content-bg: #1e293b;
+        --content-text: #f8fafc;
+    }
+    
+    .fi-btn:focus,
+    .fi-input:focus,
+    .fi-select:focus,
+    .fi-ta:focus,
+    button:focus,
+    input:focus,
+    select:focus,
+    textarea:focus,
+    a:focus,
+    [tabindex]:focus {
+        outline-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+}

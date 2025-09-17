@@ -1,0 +1,88 @@
+# Laravel
+/filament-app/vendor/
+/filament-app/node_modules/
+/filament-app/public/hot
+/filament-app/public/storage
+/filament-app/storage/*.key
+/filament-app/.env
+/filament-app/.env.backup
+/filament-app/.phpunit.result.cache
+/filament-app/Homestead.json
+/filament-app/Homestead.yaml
+/filament-app/npm-debug.log
+/filament-app/yarn-error.log
+/filament-app/.DS_Store
+/filament-app/Thumbs.db
+
+# Laravel Storage
+/filament-app/storage/app/*
+!/filament-app/storage/app/.gitignore
+!/filament-app/storage/app/public/
+/filament-app/storage/framework/cache/*
+!/filament-app/storage/framework/cache/.gitignore
+/filament-app/storage/framework/sessions/*
+!/filament-app/storage/framework/sessions/.gitignore
+/filament-app/storage/framework/testing/*
+!/filament-app/storage/framework/testing/.gitignore
+/filament-app/storage/framework/views/*
+!/filament-app/storage/framework/views/.gitignore
+/filament-app/storage/logs/*
+!/filament-app/storage/logs/.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Deployment
+deployment-temp/
+exclude-files.txt
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+*.tmp
+*.temp
