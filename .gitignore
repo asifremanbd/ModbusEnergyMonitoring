@@ -118,3 +118,8 @@ table-*.php
 update-*.php
 grant-*.sql
 setup-*.sql
+audit-*.sh
+setup-*.sh
+connect-*.bat
+start-queue-*.bat
+backup-db.php
