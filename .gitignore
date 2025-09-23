@@ -82,6 +82,13 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+production.env
+
+# SSH and server configuration
+ssh_config
+*_rsa*
+*.pem
+*.key
 
 # Temporary files
 *.tmp
