@@ -35,12 +35,18 @@ class PollGatewayJob implements ShouldQueue
      */
     public function handle(ModbusPollService $pollService): void
     {
+        $cacheKey = "gateway_polling_{$this->gateway->id}";
+        
         try {
+            // Set cache flag to indicate this gateway is being polled
+            \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addMinutes(5));
+            
             Log::info("Starting poll for gateway {$this->gateway->id} ({$this->gateway->name})");
             
             // Check if gateway is still active before polling
             if (!$this->gateway->fresh()->is_active) {
                 Log::info("Gateway {$this->gateway->id} is inactive, skipping poll");
+                \Illuminate\Support\Facades\Cache::forget($cacheKey);
                 return;
             }
 
@@ -58,6 +64,9 @@ class PollGatewayJob implements ShouldQueue
         } catch (Exception $e) {
             Log::error("Failed to poll gateway {$this->gateway->id}: " . $e->getMessage());
             
+            // Clear cache flag on error
+            \Illuminate\Support\Facades\Cache::forget($cacheKey);
+            
             // Increment failure count
             $this->gateway->increment('failure_count');
             
@@ -74,10 +83,17 @@ class PollGatewayJob implements ShouldQueue
     private function scheduleNextPoll(): void
     {
         $gateway = $this->gateway->fresh();
+        $cacheKey = "gateway_polling_{$this->gateway->id}";
         
         if ($gateway && $gateway->is_active) {
-            PollGatewayJob::dispatch($gateway)
-                ->delay(now()->addSeconds($gateway->poll_interval));
+            // Schedule next job and extend cache
+            $nextPollTime = now()->addSeconds($gateway->poll_interval);
+            \Illuminate\Support\Facades\Cache::put($cacheKey, true, $nextPollTime->addMinutes(1));
+            
+            PollGatewayJob::dispatch($gateway)->delay($nextPollTime);
+        } else {
+            // Clear cache if gateway is no longer active
+            \Illuminate\Support\Facades\Cache::forget($cacheKey);
         }
     }
 
@@ -117,6 +133,10 @@ class PollGatewayJob implements ShouldQueue
     public function failed(Exception $exception): void
     {
         Log::error("Gateway {$this->gateway->id} polling job failed permanently: " . $exception->getMessage());
+        
+        // Clear cache flag when job fails permanently
+        $cacheKey = "gateway_polling_{$this->gateway->id}";
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
         
         // Mark gateway as having issues but don't disable automatically
         $this->gateway->increment('failure_count');

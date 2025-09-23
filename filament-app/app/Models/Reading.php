@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Reading extends Model
 {
@@ -35,9 +36,9 @@ class Reading extends Model
     /**
      * Get the gateway through the data point.
      */
-    public function gateway(): BelongsTo
+    public function gateway(): HasOneThrough
     {
-        return $this->dataPoint->gateway();
+        return $this->hasOneThrough(Gateway::class, DataPoint::class, 'id', 'id', 'data_point_id', 'gateway_id');
     }
 
     /**

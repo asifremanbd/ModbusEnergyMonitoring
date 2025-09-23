@@ -27,6 +27,13 @@ class GatewayPollingService
     {
         Log::info('Stopping gateway polling system');
         
+        // Clear polling cache for all gateways
+        $gateways = Gateway::all();
+        foreach ($gateways as $gateway) {
+            $cacheKey = "gateway_polling_{$gateway->id}";
+            \Illuminate\Support\Facades\Cache::forget($cacheKey);
+        }
+        
         // Clear the polling queue
         $this->clearPollingQueue();
     }
@@ -55,6 +62,10 @@ class GatewayPollingService
         
         // Mark gateway as inactive to prevent new jobs
         $gateway->update(['is_active' => false]);
+        
+        // Clear polling cache to allow immediate restart if needed
+        $cacheKey = "gateway_polling_{$gateway->id}";
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
         
         // Note: Existing queued jobs will check the gateway status and skip if inactive
     }

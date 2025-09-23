@@ -52,13 +52,13 @@ class ScheduleGatewayPollingJob implements ShouldQueue
 
     /**
      * Check if there's already a pending poll job for the gateway.
-     * This is a simple implementation - in production you might want to use
-     * a more sophisticated approach with job tracking.
+     * Uses cache to track active polling jobs and prevent duplicates.
      */
     private function hasExistingPollJob(Gateway $gateway): bool
     {
-        // For now, we'll assume no existing jobs and let Laravel's queue handle duplicates
-        // In a production environment, you might want to implement job deduplication
-        return false;
+        $cacheKey = "gateway_polling_{$gateway->id}";
+        
+        // Check if there's an active polling job for this gateway
+        return \Illuminate\Support\Facades\Cache::has($cacheKey);
     }
 }

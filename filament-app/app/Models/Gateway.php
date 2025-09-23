@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Services\GatewayStatusService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Gateway extends Model
 {
@@ -43,7 +45,7 @@ class Gateway extends Model
     /**
      * Get the readings through data points.
      */
-    public function readings(): HasMany
+    public function readings(): HasManyThrough
     {
         return $this->hasManyThrough(Reading::class, DataPoint::class);
     }
@@ -66,16 +68,27 @@ class Gateway extends Model
     }
 
     /**
-     * Check if the gateway is online based on last seen timestamp.
+     * Get the enhanced status using GatewayStatusService.
+     */
+    public function getEnhancedStatusAttribute(): string
+    {
+        return app(GatewayStatusService::class)->computeStatus($this);
+    }
+
+    /**
+     * Get the recent error rate using GatewayStatusService.
+     */
+    public function getRecentErrorRateAttribute(): float
+    {
+        return app(GatewayStatusService::class)->getRecentErrorRate($this);
+    }
+
+    /**
+     * Check if the gateway is online based on enhanced status logic.
      */
     public function getIsOnlineAttribute(): bool
     {
-        if (!$this->last_seen_at) {
-            return false;
-        }
-        
-        // Consider online if seen within 2x poll interval + 30 seconds buffer
-        $threshold = now()->subSeconds(($this->poll_interval * 2) + 30);
-        return $this->last_seen_at->gt($threshold);
+        $status = $this->enhanced_status;
+        return $status === GatewayStatusService::STATUS_ONLINE;
     }
 }
