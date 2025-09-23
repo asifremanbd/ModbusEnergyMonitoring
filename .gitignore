@@ -86,3 +86,35 @@ node_modules/
 # Temporary files
 *.tmp
 *.temp
+
+# Database temporary files
+*.MAD
+*.MAI
+*.sql.backup
+*backup*.sql
+cleaned_backup.sql
+correct_backup_with_data.sql
+updated_backup_*.sql
+
+# Temporary scripts and config files
+check-*.php
+check-*.sh
+test-*.php
+list-*.php
+fix-*.php
+fix-*.sql
+simple-*.php
+analyze-*.php
+diagnose-*.sh
+repair*.bat
+start_mysql*.bat
+my.ini.fixed
+my.ini.minimal
+my.ini.updated
+ssh_config
+ubuntu-*.php
+local-*.php
+table-*.php
+update-*.php
+grant-*.sql
+setup-*.sql
