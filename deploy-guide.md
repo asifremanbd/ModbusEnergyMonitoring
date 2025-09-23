@@ -5,6 +5,29 @@
 - **User**: root
 - **Password**: 2tDEoBWefYLp.PYyPF
 
+## SSH Key Setup (✅ CONFIGURED)
+
+SSH key authentication is now set up! You can connect without entering the password.
+
+### Quick Connect Commands
+```bash
+# Connect using SSH alias
+ssh deploy-server
+
+# Or connect directly
+ssh -i ~/.ssh/id_rsa_deploy root@165.22.112.94
+```
+
+### Setup Details (Already Done)
+1. ✅ SSH key generated: `~/.ssh/id_rsa_deploy`
+2. ✅ Public key copied to server
+3. ✅ SSH config created for easy access
+4. ✅ Server configured for key authentication
+
+### SSH Config Location
+- Windows: `C:\Users\[Username]\.ssh\config`
+- Contains alias `deploy-server` for easy connection
+
 ## Prerequisites on Ubuntu Server
 
 ### 1. Install Required Software

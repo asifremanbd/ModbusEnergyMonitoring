@@ -81,7 +81,7 @@ Visit `http://localhost:8000/admin` to access the admin panel.
 ```
 filament-app/
 ├── app/
-│   ├── Console/Commands/     # Modbus testing and configuration commands
+│   ├── Console/Commands/     # Modbus testing and database backup commands
 │   ├── Filament/            # Admin panel resources and pages
 │   ├── Jobs/                # Background job processing
 │   ├── Livewire/            # Real-time components
@@ -89,11 +89,12 @@ filament-app/
 │   └── Services/            # Business logic services
 ├── database/
 │   ├── migrations/          # Database schema
+│   ├── migration-scripts/   # Ubuntu production migration tools
 │   └── seeders/            # Sample data
 ├── docs/                   # Comprehensive documentation
 ├── resources/
 │   └── views/livewire/     # Livewire component views
-└── tests/                  # Complete test suite
+└── tests/                  # Complete test suite including migration tests
 ```
 
 ## Key Components
@@ -104,11 +105,20 @@ filament-app/
 - **TeltonikaTemplateService**: Gateway configuration templates
 - **DataTypeConversionService**: Energy meter data processing
 
+### Migration Tools
+- **DatabaseBackup**: Automated backup with compression and validation
+- **DatabaseRestore**: Secure restore with SSH tunneling support
+- **MySQLReplication**: Master-slave replication setup and monitoring
+- **MigrationOrchestrator**: Complete migration workflow management
+- **SynchronizationMonitor**: Real-time sync status tracking
+
 ### Commands
 - `php artisan gateway:start-polling {gateway}` - Start gateway monitoring
 - `php artisan gateway:stop-polling {gateway}` - Stop gateway monitoring
 - `php artisan gateway:status` - Check polling status
 - `php artisan test:modbus` - Test Modbus connections
+- `php artisan database:backup` - Create database backup with compression
+- `php artisan database:restore` - Restore database from backup
 
 ### Models
 - **Gateway**: Teltonika gateway configuration
@@ -126,11 +136,19 @@ php artisan test --testsuite=Unit
 # Feature tests
 php artisan test --testsuite=Feature
 
+# Migration component tests
+php artisan test tests/Unit/MigrationComponents/
+php artisan test tests/Integration/MigrationIntegrationTest.php
+
 # Performance tests
 php artisan test tests/Performance/
 
 # Complete test suite
 php artisan test
+
+# Migration script testing
+cd filament-app/database/migration-scripts
+php run-tests.php
 ```
 
 ## Deployment
@@ -144,7 +162,23 @@ php artisan test
    - MySQL 8.0+
    - Supervisor (for queue workers)
 
-2. **Quick Deployment**
+2. **Database Migration Tools**
+   The project includes comprehensive database migration utilities for Ubuntu production servers:
+   ```bash
+   # MySQL setup on Ubuntu
+   cd filament-app/database/migration-scripts
+   ./install-mysql-ubuntu.sh
+   ./configure-mysql-ubuntu.sh
+   
+   # Database backup and restore
+   php backup-database.php
+   php restore-database.php
+   
+   # Migration orchestration
+   php migrate-database.php
+   ```
+
+3. **Quick Deployment**
    Use the provided deployment scripts:
    ```bash
    # Run server setup
@@ -154,7 +188,7 @@ php artisan test
    ./deploy.sh
    ```
 
-3. **Manual Deployment**
+4. **Manual Deployment**
    See `deploy-guide.md` for detailed instructions.
 
 ## Configuration
@@ -205,7 +239,30 @@ For issues and questions:
 - Review test files for usage examples
 - Create an issue for bugs or feature requests
 
+## Database Migration
+
+The project includes a complete database migration toolkit for Ubuntu production servers:
+
+### Migration Components
+- **Automated MySQL Installation**: Ubuntu-specific MySQL 8.0 setup
+- **Database Backup/Restore**: Compressed backups with integrity validation
+- **Replication Setup**: Master-slave replication with monitoring
+- **Configuration Management**: Automated Laravel config updates
+- **Migration Orchestration**: End-to-end migration workflow
+- **Sync Monitoring**: Real-time synchronization status tracking
+
+### Migration Scripts Location
+All migration tools are located in `filament-app/database/migration-scripts/` with comprehensive documentation and testing utilities.
+
 ## Changelog
+
+### v1.1.0
+- Added comprehensive database migration toolkit
+- Ubuntu production server automation
+- MySQL replication setup and monitoring
+- Database backup/restore with compression
+- Migration orchestration system
+- Extensive migration testing suite
 
 ### v1.0.0
 - Initial release with core monitoring functionality
