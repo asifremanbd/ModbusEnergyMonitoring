@@ -24,12 +24,13 @@ class LiveData extends Component
         'tags' => [],
     ];
     public $density = 'comfortable'; // 'comfortable' or 'compact'
-    public $refreshInterval = 5; // seconds
+    public $refreshInterval = 5; // seconds - dynamically set based on gateway poll intervals
     public $emptyState = null;
     
     public function mount()
     {
         $this->loadAvailableFilters();
+        $this->updateRefreshInterval();
         $this->loadLiveData();
     }
     
@@ -39,6 +40,7 @@ class LiveData extends Component
     #[On('echo:gateways,gateway.status-changed')]
     public function refreshLiveData()
     {
+        $this->updateRefreshInterval();
         $this->loadLiveData();
     }
     
@@ -63,6 +65,24 @@ class LiveData extends Component
             ->orderBy('data_type')
             ->pluck('data_type')
             ->toArray();
+    }
+    
+    public function updateRefreshInterval()
+    {
+        // Get the poll interval from the filtered gateway or the minimum from all active gateways
+        if ($this->filters['gateway']) {
+            $gateway = Gateway::find($this->filters['gateway']);
+            if ($gateway && $gateway->is_active) {
+                $this->refreshInterval = $gateway->poll_interval;
+                return;
+            }
+        }
+        
+        // If no specific gateway filter, use the minimum poll interval from all active gateways
+        $minPollInterval = Gateway::active()->min('poll_interval');
+        
+        // Default to 5 seconds if no active gateways
+        $this->refreshInterval = $minPollInterval ?: 5;
     }
     
     public function loadLiveData()
@@ -200,6 +220,12 @@ class LiveData extends Component
     public function setFilter($type, $value)
     {
         $this->filters[$type] = $value === '' ? null : $value;
+        
+        // Update refresh interval when gateway filter changes
+        if ($type === 'gateway') {
+            $this->updateRefreshInterval();
+        }
+        
         $this->loadLiveData();
     }
     
@@ -216,6 +242,9 @@ class LiveData extends Component
             'group' => null,
             'tag' => null,
         ];
+        
+        // Update refresh interval when clearing gateway filter
+        $this->updateRefreshInterval();
         $this->loadLiveData();
     }
     

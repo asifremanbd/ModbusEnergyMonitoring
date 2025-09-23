@@ -7,6 +7,7 @@ use App\Models\Gateway;
 use App\Services\GatewayManagementService;
 use App\Services\ModbusPollService;
 use App\Services\NotificationService;
+use App\Services\GatewayStatusService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -334,17 +335,22 @@ class GatewayResource extends Resource
                 
                 TextColumn::make('status')
                     ->getStateUsing(function (Gateway $record): string {
-                        if (!$record->is_active) {
-                            return 'disabled';
-                        }
-                        return $record->is_online ? 'online' : 'offline';
+                        return app(GatewayStatusService::class)->computeStatus($record);
+                    })
+                    ->formatStateUsing(function (string $state): string {
+                        return app(GatewayStatusService::class)->getStatusLabel($state);
                     })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'online' => 'success',
-                        'offline' => 'danger',
-                        'disabled' => 'gray',
-                        default => 'gray',
+                    ->color(function (string $state): string {
+                        return app(GatewayStatusService::class)->getStatusBadgeColor($state);
+                    })
+                    ->extraAttributes(function (Gateway $record): array {
+                        $status = app(GatewayStatusService::class)->computeStatus($record);
+                        $label = app(GatewayStatusService::class)->getStatusLabel($status);
+                        return [
+                            'aria-label' => "Gateway status: {$label}",
+                            'role' => 'status',
+                        ];
                     }),
                 
                 IconColumn::make('is_active')
@@ -364,14 +370,17 @@ class GatewayResource extends Resource
                     ]),
             ])
             ->actions([
-                Action::make('view')
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->url(fn (Gateway $record): string => GatewayResource::getUrl('view', ['record' => $record])),
-                
                 Action::make('test_connection')
-                    ->icon('heroicon-o-signal')
+                    ->icon('heroicon-o-radio')
+                    ->tooltip('Test connection')
+                    ->label(null)
+                    ->button()
                     ->color('warning')
+                    ->extraAttributes([
+                        'aria-label' => 'Test gateway connection',
+                        'role' => 'button',
+                        'tabindex' => '0',
+                    ])
                     ->action(function (Gateway $record) {
                         $pollService = app(ModbusPollService::class);
                         $notificationService = app(NotificationService::class);
@@ -403,7 +412,15 @@ class GatewayResource extends Resource
                 
                 Action::make('pause')
                     ->icon('heroicon-o-pause')
+                    ->tooltip('Pause polling')
+                    ->label(null)
+                    ->button()
                     ->color('warning')
+                    ->extraAttributes([
+                        'aria-label' => 'Pause gateway polling',
+                        'role' => 'button',
+                        'tabindex' => '0',
+                    ])
                     ->action(function (Gateway $record) {
                         $service = app(GatewayManagementService::class);
                         $notificationService = app(NotificationService::class);
@@ -428,9 +445,17 @@ class GatewayResource extends Resource
                     ->modalDescription('This will stop polling this gateway until you restart it.')
                     ->modalSubmitActionLabel('Pause Polling'),
                 
-                Action::make('restart')
+                Action::make('resume')
                     ->icon('heroicon-o-play')
+                    ->tooltip('Resume polling')
+                    ->label(null)
+                    ->button()
                     ->color('success')
+                    ->extraAttributes([
+                        'aria-label' => 'Resume gateway polling',
+                        'role' => 'button',
+                        'tabindex' => '0',
+                    ])
                     ->action(function (Gateway $record) {
                         $service = app(GatewayManagementService::class);
                         $notificationService = app(NotificationService::class);
@@ -451,14 +476,32 @@ class GatewayResource extends Resource
                     })
                     ->visible(fn (Gateway $record): bool => !$record->is_active)
                     ->requiresConfirmation()
-                    ->modalHeading('Restart Gateway Polling')
+                    ->modalHeading('Resume Gateway Polling')
                     ->modalDescription('This will resume polling for this gateway.')
-                    ->modalSubmitActionLabel('Restart Polling'),
+                    ->modalSubmitActionLabel('Resume Polling'),
                 
                 Tables\Actions\EditAction::make()
+                    ->icon('heroicon-o-pencil')
+                    ->tooltip('Edit gateway')
+                    ->label(null)
+                    ->button()
+                    ->extraAttributes([
+                        'aria-label' => 'Edit gateway',
+                        'role' => 'button',
+                        'tabindex' => '0',
+                    ])
                     ->slideOver(),
                 
                 Tables\Actions\DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->tooltip('Delete gateway')
+                    ->label(null)
+                    ->button()
+                    ->extraAttributes([
+                        'aria-label' => 'Delete gateway',
+                        'role' => 'button',
+                        'tabindex' => '0',
+                    ])
                     ->action(function (Gateway $record) {
                         $service = app(GatewayManagementService::class);
                         $notificationService = app(NotificationService::class);
