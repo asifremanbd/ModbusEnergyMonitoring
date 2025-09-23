@@ -264,36 +264,62 @@ class ModbusPollService
             }
             $scaledValue = $rawValue * $dataPoint->scale_factor;
             
-            // Create and save reading
-            $reading = Reading::create([
-                'data_point_id' => $dataPoint->id,
-                'raw_value' => json_encode($registers),
-                'scaled_value' => $scaledValue,
-                'quality' => 'good',
-                'read_at' => Carbon::now()
-            ]);
-            
-            // Broadcast new reading event
-            NewReadingReceived::dispatch($reading);
-            
-            return $reading;
+            // Create and save reading with duplicate handling
+            try {
+                $reading = Reading::create([
+                    'data_point_id' => $dataPoint->id,
+                    'raw_value' => json_encode($registers),
+                    'scaled_value' => $scaledValue,
+                    'quality' => 'good',
+                    'read_at' => Carbon::now()
+                ]);
+                
+                // Broadcast new reading event
+                NewReadingReceived::dispatch($reading);
+                
+                return $reading;
+                
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // Handle duplicate reading gracefully - this can happen with concurrent polling
+                Log::info("Duplicate reading detected for data point {$dataPoint->id} at " . Carbon::now() . ", skipping");
+                
+                // Return the existing reading instead
+                $existingReading = Reading::where('data_point_id', $dataPoint->id)
+                    ->where('read_at', Carbon::now())
+                    ->first();
+                    
+                return $existingReading;
+            }
             
         } catch (Exception $e) {
             Log::warning("Failed to read data point {$dataPoint->id}: " . $e->getMessage());
             
-            // Create failed reading record
-            $reading = Reading::create([
-                'data_point_id' => $dataPoint->id,
-                'raw_value' => null,
-                'scaled_value' => null,
-                'quality' => 'bad',
-                'read_at' => Carbon::now()
-            ]);
-            
-            // Broadcast new reading event (even for failed readings)
-            NewReadingReceived::dispatch($reading);
-            
-            return $reading;
+            // Create failed reading record with duplicate handling
+            try {
+                $reading = Reading::create([
+                    'data_point_id' => $dataPoint->id,
+                    'raw_value' => null,
+                    'scaled_value' => null,
+                    'quality' => 'bad',
+                    'read_at' => Carbon::now()
+                ]);
+                
+                // Broadcast new reading event (even for failed readings)
+                NewReadingReceived::dispatch($reading);
+                
+                return $reading;
+                
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // Handle duplicate reading gracefully - this can happen with concurrent polling
+                Log::info("Duplicate failed reading detected for data point {$dataPoint->id} at " . Carbon::now() . ", skipping");
+                
+                // Return the existing reading instead
+                $existingReading = Reading::where('data_point_id', $dataPoint->id)
+                    ->where('read_at', Carbon::now())
+                    ->first();
+                    
+                return $existingReading;
+            }
         }
     }
 

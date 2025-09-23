@@ -12,9 +12,21 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Start gateway polling system every 5 minutes to ensure it's running
-        $schedule->command('gateway:start-polling')
+        // Audit and validate polling system integrity every 10 minutes
+        $schedule->command('polling:reliable audit')
+            ->everyTenMinutes()
+            ->withoutOverlapping()
+            ->runInBackground();
+            
+        // Validate polling integrity every 5 minutes
+        $schedule->command('polling:reliable validate')
             ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->runInBackground();
+            
+        // Automatically fix polling schedule issues every 15 minutes
+        $schedule->command('polling:fix-schedule')
+            ->everyFifteenMinutes()
             ->withoutOverlapping()
             ->runInBackground();
     }

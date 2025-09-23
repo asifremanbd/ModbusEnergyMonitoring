@@ -49,6 +49,18 @@ rm -f /etc/nginx/sites-enabled/default
 # Test Nginx configuration
 nginx -t
 
+# Install Redis if not already installed
+echo "📦 Installing Redis..."
+apt update
+apt install -y redis-server
+systemctl enable redis-server
+systemctl start redis-server
+
+# Setup reliable polling system
+echo "🔄 Setting up reliable polling system..."
+chmod +x setup-reliable-polling.sh
+./setup-reliable-polling.sh
+
 # Restart services
 echo "🔄 Restarting services..."
 systemctl restart nginx
@@ -56,3 +68,4 @@ systemctl restart php8.1-fpm
 
 echo "✅ Application setup completed!"
 echo "🌐 Your app should be available at: http://165.22.112.94"
+echo "📊 Check polling status with: php artisan polling:reliable status"

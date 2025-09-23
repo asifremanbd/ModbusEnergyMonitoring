@@ -16,3 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect('/admin');
 });
+
+// Polling system health check endpoints
+Route::prefix('api/polling')->group(function () {
+    Route::get('/health', [App\Http\Controllers\PollingHealthController::class, 'health']);
+    Route::get('/status', [App\Http\Controllers\PollingHealthController::class, 'status']);
+    Route::post('/audit', [App\Http\Controllers\PollingHealthController::class, 'audit']);
+});
