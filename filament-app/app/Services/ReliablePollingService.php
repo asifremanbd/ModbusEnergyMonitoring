@@ -177,7 +177,7 @@ class ReliablePollingService
                 'next_poll_due' => null,
             ];
             
-            if ($pollingStatus) {
+            if ($pollingStatus && isset($pollingStatus['last_scheduled'])) {
                 $lastScheduled = Carbon::parse($pollingStatus['last_scheduled']);
                 $nextDue = $lastScheduled->addSeconds($gateway->poll_interval);
                 

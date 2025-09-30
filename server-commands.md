@@ -10,6 +10,57 @@ ssh -i ~/.ssh/id_rsa_deploy root@165.22.112.94
 
 # Or use the batch file
 connect-server.bat
+
+# Troubleshooting connection issues
+ssh -v -i ~/.ssh/id_rsa_deploy root@165.22.112.94  # Verbose output
+ssh -o ConnectTimeout=30 -i ~/.ssh/id_rsa_deploy root@165.22.112.94  # Longer timeout
+```
+
+### 🔧 Connection Troubleshooting
+```bash
+# Test server connectivity
+ping 165.22.112.94
+
+# Test SSH port (Windows PowerShell)
+Test-NetConnection -ComputerName 165.22.112.94 -Port 22
+
+# Test alternative SSH ports
+Test-NetConnection -ComputerName 165.22.112.94 -Port 2222
+
+# Test web server (should work)
+Test-NetConnection -ComputerName 165.22.112.94 -Port 80
+Invoke-WebRequest -Uri "http://165.22.112.94" -Method Head
+
+# Check if server is responding on any port
+nmap -p 22,80,443,2222 165.22.112.94
+```
+
+### ⚠️ Current Status (as of Sept 24, 2025)
+- ✅ **Server is ONLINE** - responds to ping and HTTP requests
+- ✅ **Web application accessible** at http://165.22.112.94
+- ❌ **SSH access BLOCKED** - port 22 is not accessible
+- ❌ **HTTPS not configured** - port 443 is closed
+
+### 🚨 SSH Access Issues
+**Problem**: SSH connections timeout because port 22 is blocked/disabled
+**Possible causes**:
+1. Hosting provider disabled SSH for security
+2. Firewall blocking SSH access
+3. SSH service stopped or misconfigured
+4. Server security policy changes
+
+### 💡 Alternative Access Methods
+```bash
+# 1. Check if hosting provider has web-based terminal
+# Visit your hosting provider's control panel
+
+# 2. Try accessing via web interface
+# Open browser: http://165.22.112.94
+
+# 3. Contact hosting provider to:
+#    - Enable SSH access
+#    - Get alternative connection methods
+#    - Check server security settings
 ```
 
 ## 📊 Server Status Commands

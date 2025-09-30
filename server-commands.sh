@@ -27,6 +27,17 @@ chmod -R 755 /var/www/filament-app
 chmod -R 775 /var/www/filament-app/storage
 chmod -R 775 /var/www/filament-app/bootstrap/cache
 
+# Ensure log directory exists and has correct permissions
+mkdir -p /var/www/filament-app/storage/logs
+chmod 775 /var/www/filament-app/storage/logs
+chown www-data:www-data /var/www/filament-app/storage/logs
+
+# Fix existing log file permissions if it exists
+if [ -f /var/www/filament-app/storage/logs/laravel.log ]; then
+    chmod 664 /var/www/filament-app/storage/logs/laravel.log
+    chown www-data:www-data /var/www/filament-app/storage/logs/laravel.log
+fi
+
 # Create symbolic link for storage
 php artisan storage:link
 

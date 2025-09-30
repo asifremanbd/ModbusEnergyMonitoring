@@ -1,0 +1,2 @@
+put "filament-app\storage\app\database-backups\laravel_backup_2025-09-23_01-49-35.sql" /root/ 
+quit 
