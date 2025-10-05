@@ -262,6 +262,82 @@
                     @endif
                 </section>
 
+                {{-- Weekly Meter Cards --}}
+                @if(!empty($weeklyMeterCards))
+                    <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+                             aria-labelledby="weekly-usage-heading"
+                             role="region">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="weekly-usage-heading" class="text-lg font-medium text-gray-900">Weekly Usage (per meter)</h3>
+                            <span class="text-sm text-gray-500">Last 7 days</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
+                             role="list" 
+                             aria-label="Weekly meter usage cards">
+                            @foreach($weeklyMeterCards as $card)
+                                <div class="meter-usage-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200"
+                                     role="listitem"
+                                     aria-label="Meter {{ $card['label'] }} - Weekly usage: {{ number_format($card['total_usage'], 2) }} {{ $card['unit'] }}">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium text-gray-900 truncate">{{ $card['label'] }}</h4>
+                                            <p class="text-xs text-gray-500">{{ $card['gateway_name'] }}</p>
+                                        </div>
+                                        <div class="flex-shrink-0 ml-2">
+                                            <span class="usage-indicator inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                {{ $card['color'] === 'green' ? 'bg-green-100 text-green-800' : 
+                                                   ($card['color'] === 'yellow' ? 'bg-yellow-100 text-yellow-800' : 
+                                                   ($card['color'] === 'red' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800')) }}">
+                                                <span class="usage-dot w-1.5 h-1.5 rounded-full mr-1
+                                                    {{ $card['color'] === 'green' ? 'bg-green-400' : 
+                                                       ($card['color'] === 'yellow' ? 'bg-yellow-400' : 
+                                                       ($card['color'] === 'red' ? 'bg-red-400' : 'bg-blue-400')) }}" 
+                                                      aria-hidden="true"></span>
+                                                {{ ucfirst($card['color']) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-500">Total Usage:</span>
+                                            <span class="font-bold text-gray-900">{{ number_format($card['total_usage'], 2) }} {{ $card['unit'] }}</span>
+                                        </div>
+                                        
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Daily Average:</span>
+                                            <span class="font-medium text-gray-900">{{ number_format($card['average_daily'], 2) }} {{ $card['unit'] }}/day</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Daily Usage Sparkline --}}
+                                    @if(!empty($card['daily_usage']) && array_sum($card['daily_usage']) > 0)
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="text-xs text-gray-500">Daily usage (7 days)</span>
+                                            </div>
+                                            <div class="h-8 flex items-end space-x-1" 
+                                                 role="img" 
+                                                 aria-label="Daily usage sparkline chart for {{ $card['label'] }}"
+                                                 tabindex="0">
+                                                @foreach($card['daily_usage'] as $value)
+                                                    <div class="flex-1 rounded-sm min-h-1
+                                                        {{ $card['color'] === 'green' ? 'bg-green-200' : 
+                                                           ($card['color'] === 'yellow' ? 'bg-yellow-200' : 
+                                                           ($card['color'] === 'red' ? 'bg-red-200' : 'bg-blue-200')) }}" 
+                                                         style="height: {{ max(4, ($value / max(array_merge($card['daily_usage'], [1]))) * 100) }}%"
+                                                         title="Day usage: {{ $value }} {{ $card['unit'] }}"></div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
                 {{-- Recent Events Timeline --}}
                 <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
                          aria-labelledby="recent-events-heading"

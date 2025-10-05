@@ -6,6 +6,7 @@ use App\Models\Gateway;
 use App\Models\DataPoint;
 use App\Models\Reading;
 use App\Services\ErrorHandlingService;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -15,6 +16,7 @@ class Dashboard extends Component
     public $kpis = [];
     public $gateways = [];
     public $recentEvents = [];
+    public $weeklyMeterCards = [];
     public $emptyState = null;
     
     public function mount()
@@ -38,6 +40,7 @@ class Dashboard extends Component
         if (!$this->emptyState) {
             $this->loadKpis();
             $this->loadGateways();
+            $this->loadWeeklyMeterCards();
             $this->loadRecentEvents();
         }
     }
@@ -179,6 +182,139 @@ class Dashboard extends Component
             ->toArray();
     }
     
+    private function loadWeeklyMeterCards()
+    {
+        $dataPoints = DataPoint::with(['gateway', 'readings' => function ($query) {
+            $query->where('read_at', '>=', now()->subDays(8))
+                  ->where('quality', 'good')
+                  ->orderBy('read_at');
+        }])
+        ->enabled()
+        ->get();
+
+        $this->weeklyMeterCards = [];
+        
+        foreach ($dataPoints as $dataPoint) {
+            $weeklyData = $this->calculateWeeklyUsage($dataPoint);
+            
+            if ($weeklyData['totalUsage'] !== null && $weeklyData['totalUsage'] > 0) {
+                $this->weeklyMeterCards[] = [
+                    'id' => $dataPoint->id,
+                    'label' => $dataPoint->label,
+                    'gateway_name' => $dataPoint->gateway->name ?? 'Unknown Gateway',
+                    'total_usage' => $weeklyData['totalUsage'],
+                    'unit' => $weeklyData['unit'],
+                    'daily_usage' => $weeklyData['dailyUsage'],
+                    'average_daily' => round($weeklyData['totalUsage'] / 7, 2),
+                    'color' => $this->getColorForUsage($weeklyData['totalUsage'], $weeklyData['unit'])
+                ];
+            }
+        }
+    }
+    
+    private function calculateWeeklyUsage(DataPoint $dataPoint): array
+    {
+        $readings = $dataPoint->readings;
+        
+        if ($readings->count() < 2) {
+            return [
+                'totalUsage' => null,
+                'dailyUsage' => [],
+                'unit' => $this->getUnit($dataPoint),
+            ];
+        }
+        
+        // Sort readings by timestamp
+        $sortedReadings = $readings->sortBy('read_at');
+        
+        // Group readings by day and calculate daily consumption
+        $dailyUsage = [];
+        $totalUsage = 0;
+        
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $dayStart = Carbon::parse($date)->startOfDay();
+            $dayEnd = Carbon::parse($date)->endOfDay();
+            
+            $dayReadings = $sortedReadings->filter(function ($reading) use ($dayStart, $dayEnd) {
+                return $reading->read_at->between($dayStart, $dayEnd);
+            });
+            
+            $dayUsage = 0;
+            if ($dayReadings->count() >= 2) {
+                $firstReading = $dayReadings->first();
+                $lastReading = $dayReadings->last();
+                
+                // Handle cumulative meter readings - consumption is the difference
+                if ($lastReading->scaled_value !== null && 
+                    $firstReading->scaled_value !== null && 
+                    $lastReading->scaled_value >= $firstReading->scaled_value) {
+                    $dayUsage = $lastReading->scaled_value - $firstReading->scaled_value;
+                    $totalUsage += $dayUsage;
+                }
+            }
+            
+            $dailyUsage[] = round($dayUsage, 2);
+        }
+        
+        return [
+            'totalUsage' => round($totalUsage, 2),
+            'dailyUsage' => $dailyUsage,
+            'unit' => $this->getUnit($dataPoint),
+        ];
+    }
+    
+    private function getUnit(DataPoint $dataPoint): string
+    {
+        $label = strtolower($dataPoint->label);
+        $groupName = strtolower($dataPoint->group_name);
+        $searchText = $label . ' ' . $groupName;
+        
+        // Energy-related keywords
+        $energyKeywords = ['energy', 'kwh', 'kw-h', 'kilowatt', 'watt', 'power', 'electricity', 'electric'];
+        foreach ($energyKeywords as $keyword) {
+            if (str_contains($searchText, $keyword)) {
+                return 'kWh';
+            }
+        }
+        
+        // Water-related keywords
+        $waterKeywords = ['water', 'm³', 'm3', 'cubic', 'liter', 'litre', 'gallon', 'flow'];
+        foreach ($waterKeywords as $keyword) {
+            if (str_contains($searchText, $keyword)) {
+                return 'm³';
+            }
+        }
+        
+        // Gas-related keywords
+        $gasKeywords = ['gas', 'natural gas', 'propane', 'methane'];
+        foreach ($gasKeywords as $keyword) {
+            if (str_contains($searchText, $keyword)) {
+                return 'm³';
+            }
+        }
+        
+        return 'units';
+    }
+    
+    private function getColorForUsage(float $usage, string $unit): string
+    {
+        // Color coding based on usage levels (can be customized)
+        if ($unit === 'kWh') {
+            if ($usage > 100) return 'red';
+            if ($usage > 50) return 'yellow';
+            return 'green';
+        }
+        
+        if ($unit === 'm³') {
+            if ($usage > 50) return 'red';
+            if ($usage > 25) return 'yellow';
+            return 'green';
+        }
+        
+        return 'blue';
+    }
+
     public function render()
     {
         return view('livewire.dashboard');
