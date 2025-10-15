@@ -17,6 +17,13 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+// User Management Routes (bypasses Filament)
+Route::middleware(['web'])->group(function () {
+    Route::get('/user-management', [App\Http\Controllers\UserManagementController::class, 'index']);
+    Route::post('/user-management', [App\Http\Controllers\UserManagementController::class, 'store']);
+    Route::delete('/user-management/{user}', [App\Http\Controllers\UserManagementController::class, 'destroy']);
+});
+
 // Polling system health check endpoints
 Route::prefix('api/polling')->group(function () {
     Route::get('/health', [App\Http\Controllers\PollingHealthController::class, 'health']);
