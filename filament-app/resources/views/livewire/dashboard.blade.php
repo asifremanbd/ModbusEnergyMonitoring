@@ -31,6 +31,33 @@
                 @endif
             </div>
         @else
+            {{-- Historical Data Notice --}}
+            @php
+                $hasHistoricalData = collect($weeklyMeterCards)->contains('is_historical', true) || 
+                                   collect($recentEvents)->contains('is_historical', true) ||
+                                   collect($gateways)->every(fn($g) => $g['status'] === 'offline');
+            @endphp
+            
+            @if($hasHistoricalData)
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-amber-800">
+                                Showing Historical Data
+                            </h3>
+                            <div class="mt-1 text-sm text-amber-700">
+                                <p>Gateways are currently offline. Dashboard is displaying the most recent available data for monitoring purposes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div class="space-y-6">
                 {{-- KPI Tiles --}}
                 <section aria-labelledby="kpi-heading" class="fi-dashboard-tiles grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">

@@ -60,8 +60,9 @@ class Dashboard extends Component
             return;
         }
         
-        $recentReadings = Reading::where('read_at', '>=', now()->subHour())->count();
-        if ($recentReadings === 0) {
+        // Check for any historical readings instead of just recent ones
+        $anyReadings = Reading::count();
+        if ($anyReadings === 0) {
             $this->emptyState = app(ErrorHandlingService::class)->getEmptyStateMessage('no_readings');
             return;
         }
@@ -78,13 +79,19 @@ class Dashboard extends Component
             return $gateway->is_online;
         })->count();
         
-        // Calculate poll success rate from last 24 hours
+        // Calculate poll success rate - try last 24 hours first, then expand timeframe
         $recentReadings = Reading::where('read_at', '>=', now()->subDay())->get();
+        
+        // If no recent readings, get the last available readings for historical context
+        if ($recentReadings->isEmpty()) {
+            $recentReadings = Reading::orderBy('read_at', 'desc')->take(100)->get();
+        }
+        
         $successRate = $recentReadings->isEmpty() ? 0 : 
             ($recentReadings->where('quality', 'good')->count() / $recentReadings->count()) * 100;
         
         // Calculate average latency from gateway success/failure counts
-        $activeGateways = Gateway::active()->get();
+        $activeGateways = Gateway::get(); // Include all gateways, not just active ones
         $avgLatency = $activeGateways->isEmpty() ? 0 : 
             $activeGateways->avg(function ($gateway) {
                 // Estimate latency based on poll interval and success rate
@@ -117,11 +124,22 @@ class Dashboard extends Component
         $this->gateways = Gateway::with(['dataPoints' => function ($query) {
             $query->where('is_enabled', true);
         }])->get()->map(function ($gateway) {
+            // Try to get recent readings first, then fall back to historical data
             $recentReadings = Reading::whereHas('dataPoint', function ($query) use ($gateway) {
                 $query->where('gateway_id', $gateway->id);
             })->where('read_at', '>=', now()->subHour())
             ->orderBy('read_at')
             ->get();
+            
+            // If no recent readings, get the last available readings for this gateway
+            if ($recentReadings->isEmpty()) {
+                $recentReadings = Reading::whereHas('dataPoint', function ($query) use ($gateway) {
+                    $query->where('gateway_id', $gateway->id);
+                })->orderBy('read_at', 'desc')
+                ->take(20)
+                ->get()
+                ->reverse(); // Reverse to get chronological order
+            }
             
             // Generate sparkline data (last 10 data points)
             $sparklineData = $recentReadings->groupBy(function ($reading) {
@@ -130,6 +148,17 @@ class Dashboard extends Component
                 return $readings->where('quality', 'good')->count();
             })->values()->toArray();
             
+            // Calculate success rate from available data
+            $totalReadings = Reading::whereHas('dataPoint', function ($query) use ($gateway) {
+                $query->where('gateway_id', $gateway->id);
+            })->count();
+            
+            $successfulReadings = Reading::whereHas('dataPoint', function ($query) use ($gateway) {
+                $query->where('gateway_id', $gateway->id);
+            })->where('quality', 'good')->count();
+            
+            $calculatedSuccessRate = $totalReadings > 0 ? ($successfulReadings / $totalReadings) * 100 : 0;
+            
             return [
                 'id' => $gateway->id,
                 'name' => $gateway->name,
@@ -137,7 +166,7 @@ class Dashboard extends Component
                 'port' => $gateway->port,
                 'is_online' => $gateway->is_online,
                 'last_seen_at' => $gateway->last_seen_at,
-                'success_rate' => $gateway->success_rate,
+                'success_rate' => $calculatedSuccessRate > 0 ? $calculatedSuccessRate : $gateway->success_rate,
                 'data_points_count' => $gateway->dataPoints->count(),
                 'sparkline_data' => $sparklineData,
                 'status' => $gateway->is_online ? 'online' : 'offline'
@@ -175,7 +204,47 @@ class Dashboard extends Component
                 ];
             });
         
-        $this->recentEvents = $offlineEvents->concat($configEvents)
+        $allEvents = $offlineEvents->concat($configEvents);
+        
+        // If no recent events, show historical events
+        if ($allEvents->isEmpty()) {
+            // Get historical offline events (gateways that have been offline)
+            $historicalOfflineEvents = Gateway::whereNotNull('last_seen_at')
+                ->where('last_seen_at', '<=', now()->subMinutes(5))
+                ->orderBy('last_seen_at', 'desc')
+                ->take(5)
+                ->get()
+                ->map(function ($gateway) {
+                    return [
+                        'type' => 'gateway_offline',
+                        'message' => "Gateway '{$gateway->name}' was offline",
+                        'gateway_name' => $gateway->name,
+                        'timestamp' => $gateway->last_seen_at,
+                        'severity' => 'warning',
+                        'is_historical' => true
+                    ];
+                });
+            
+            // Get historical configuration events
+            $historicalConfigEvents = Gateway::where('updated_at', '!=', Gateway::raw('created_at'))
+                ->orderBy('updated_at', 'desc')
+                ->take(5)
+                ->get()
+                ->map(function ($gateway) {
+                    return [
+                        'type' => 'configuration_changed',
+                        'message' => "Gateway '{$gateway->name}' configuration was updated",
+                        'gateway_name' => $gateway->name,
+                        'timestamp' => $gateway->updated_at,
+                        'severity' => 'info',
+                        'is_historical' => true
+                    ];
+                });
+            
+            $allEvents = $historicalOfflineEvents->concat($historicalConfigEvents);
+        }
+        
+        $this->recentEvents = $allEvents
             ->sortByDesc('timestamp')
             ->take(10)
             ->values()
@@ -197,6 +266,11 @@ class Dashboard extends Component
         foreach ($dataPoints as $dataPoint) {
             $weeklyData = $this->calculateWeeklyUsage($dataPoint);
             
+            // If no recent weekly data, try to get historical data for this data point
+            if ($weeklyData['totalUsage'] === null || $weeklyData['totalUsage'] <= 0) {
+                $weeklyData = $this->calculateHistoricalUsage($dataPoint);
+            }
+            
             if ($weeklyData['totalUsage'] !== null && $weeklyData['totalUsage'] > 0) {
                 $this->weeklyMeterCards[] = [
                     'id' => $dataPoint->id,
@@ -206,7 +280,8 @@ class Dashboard extends Component
                     'unit' => $weeklyData['unit'],
                     'daily_usage' => $weeklyData['dailyUsage'],
                     'average_daily' => round($weeklyData['totalUsage'] / 7, 2),
-                    'color' => $this->getColorForUsage($weeklyData['totalUsage'], $weeklyData['unit'])
+                    'color' => $this->getColorForUsage($weeklyData['totalUsage'], $weeklyData['unit']),
+                    'is_historical' => $weeklyData['is_historical'] ?? false
                 ];
             }
         }
@@ -297,6 +372,80 @@ class Dashboard extends Component
         return 'units';
     }
     
+    private function calculateHistoricalUsage(DataPoint $dataPoint): array
+    {
+        // Get the most recent 7-day period that has data
+        $latestReading = Reading::where('data_point_id', $dataPoint->id)
+            ->where('quality', 'good')
+            ->orderBy('read_at', 'desc')
+            ->first();
+        
+        if (!$latestReading) {
+            return [
+                'totalUsage' => null,
+                'dailyUsage' => [],
+                'unit' => $this->getUnit($dataPoint),
+                'is_historical' => true
+            ];
+        }
+        
+        // Get readings from 7 days before the latest reading
+        $endDate = $latestReading->read_at;
+        $startDate = $endDate->copy()->subDays(7);
+        
+        $readings = Reading::where('data_point_id', $dataPoint->id)
+            ->where('quality', 'good')
+            ->where('read_at', '>=', $startDate)
+            ->where('read_at', '<=', $endDate)
+            ->orderBy('read_at')
+            ->get();
+        
+        if ($readings->count() < 2) {
+            return [
+                'totalUsage' => null,
+                'dailyUsage' => [],
+                'unit' => $this->getUnit($dataPoint),
+                'is_historical' => true
+            ];
+        }
+        
+        // Calculate daily usage for the historical period
+        $dailyUsage = [];
+        $totalUsage = 0;
+        
+        for ($i = 6; $i >= 0; $i--) {
+            $date = $endDate->copy()->subDays($i)->format('Y-m-d');
+            $dayStart = Carbon::parse($date)->startOfDay();
+            $dayEnd = Carbon::parse($date)->endOfDay();
+            
+            $dayReadings = $readings->filter(function ($reading) use ($dayStart, $dayEnd) {
+                return $reading->read_at->between($dayStart, $dayEnd);
+            });
+            
+            $dayUsage = 0;
+            if ($dayReadings->count() >= 2) {
+                $firstReading = $dayReadings->first();
+                $lastReading = $dayReadings->last();
+                
+                if ($lastReading->scaled_value !== null && 
+                    $firstReading->scaled_value !== null && 
+                    $lastReading->scaled_value >= $firstReading->scaled_value) {
+                    $dayUsage = $lastReading->scaled_value - $firstReading->scaled_value;
+                    $totalUsage += $dayUsage;
+                }
+            }
+            
+            $dailyUsage[] = round($dayUsage, 2);
+        }
+        
+        return [
+            'totalUsage' => round($totalUsage, 2),
+            'dailyUsage' => $dailyUsage,
+            'unit' => $this->getUnit($dataPoint),
+            'is_historical' => true
+        ];
+    }
+
     private function getColorForUsage(float $usage, string $unit): string
     {
         // Color coding based on usage levels (can be customized)
