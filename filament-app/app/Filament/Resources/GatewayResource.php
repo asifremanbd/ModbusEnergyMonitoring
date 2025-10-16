@@ -128,15 +128,44 @@ class GatewayResource extends Resource
                             ->schema([
                                 Forms\Components\Grid::make(12)
                                     ->schema([
-                                        Forms\Components\TextInput::make('group_name')
-                                            ->label('Group')
+                                        Forms\Components\Select::make('application')
+                                            ->label('Application')
+                                            ->options([
+                                                'monitoring' => 'Monitoring',
+                                                'automation' => 'Automation',
+                                            ])
+                                            ->default('monitoring')
                                             ->required()
-                                            ->default('Meter_1')
-                                            ->placeholder('Meter_1')
+                                            ->reactive()
                                             ->columnSpan(2),
                                         
+                                        Forms\Components\Select::make('unit')
+                                            ->label('Unit')
+                                            ->options([
+                                                'kWh' => 'kWh',
+                                                'm³' => 'm³',
+                                                'none' => 'None',
+                                            ])
+                                            ->default('kWh')
+                                            ->visible(fn (Forms\Get $get): bool => $get('application') === 'monitoring')
+                                            ->columnSpan(1),
+                                        
+                                        Forms\Components\Select::make('load_type')
+                                            ->label('Load Type')
+                                            ->options([
+                                                'power' => 'Power',
+                                                'water' => 'Water',
+                                                'socket' => 'Socket',
+                                                'radiator' => 'Radiator',
+                                                'fan' => 'Fan',
+                                                'faucet' => 'Faucet',
+                                                'ac' => 'AC',
+                                                'other' => 'Other',
+                                            ])
+                                            ->columnSpan(1),
+                                        
                                         Forms\Components\TextInput::make('label')
-                                            ->label('Label')
+                                            ->label('Custom Label')
                                             ->required()
                                             ->placeholder('Voltage L1')
                                             ->columnSpan(2),
@@ -192,7 +221,7 @@ class GatewayResource extends Resource
                                             ])
                                             ->default('word_swapped')
                                             ->required()
-                                            ->columnSpan(2),
+                                            ->columnSpan(1),
                                         
                                         Forms\Components\TextInput::make('scale_factor')
                                             ->label('Scale')

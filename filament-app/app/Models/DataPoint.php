@@ -14,6 +14,9 @@ class DataPoint extends Model
     protected $fillable = [
         'gateway_id',
         'group_name',
+        'application',
+        'unit',
+        'load_type',
         'label',
         'modbus_function',
         'register_address',
