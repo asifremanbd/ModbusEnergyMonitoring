@@ -67,7 +67,9 @@ class WebSocketCommunicationTest extends TestCase
         $gateway = Gateway::factory()->create(['name' => 'Test Gateway']);
         $dataPoint = DataPoint::factory()->create([
             'gateway_id' => $gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Voltage L1',
         ]);
 
@@ -90,7 +92,7 @@ class WebSocketCommunicationTest extends TestCase
         $this->assertEquals(230.5, $broadcastData['reading']['scaled_value']);
         $this->assertEquals('good', $broadcastData['reading']['quality']);
         $this->assertEquals($gateway->id, $broadcastData['reading']['data_point']['gateway_id']);
-        $this->assertEquals('Meter_1', $broadcastData['reading']['data_point']['group_name']);
+        $this->assertEquals('Meter_1', $broadcastData['reading']['data_point']['application']);
         $this->assertEquals('Voltage L1', $broadcastData['reading']['data_point']['label']);
     }
 

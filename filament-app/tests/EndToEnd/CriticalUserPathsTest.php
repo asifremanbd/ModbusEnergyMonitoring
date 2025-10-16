@@ -83,7 +83,7 @@ class CriticalUserPathsTest extends TestCase
         foreach ($template['data_points'] as $pointData) {
             DataPoint::create([
                 'gateway_id' => $gateway->id,
-                'group_name' => $pointData['group_name'],
+                'application' => $pointData['application'],
                 'label' => $pointData['label'],
                 'modbus_function' => $pointData['modbus_function'],
                 'register_address' => $pointData['register_address'],
@@ -406,7 +406,9 @@ class CriticalUserPathsTest extends TestCase
         // Step 1: User creates custom data point configuration
         $customDataPoint = DataPoint::create([
             'gateway_id' => $gateway->id,
-            'group_name' => 'Custom_Measurements',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Power Factor',
             'modbus_function' => 4,
             'register_address' => 500,
@@ -441,7 +443,7 @@ class CriticalUserPathsTest extends TestCase
         foreach ($groups as $index => $group) {
             DataPoint::create([
                 'gateway_id' => $gateway->id,
-                'group_name' => $group,
+                'application' => $group,
                 'label' => 'Power Factor',
                 'modbus_function' => 4,
                 'register_address' => 500 + ($index * $registerOffset),
@@ -466,7 +468,9 @@ class CriticalUserPathsTest extends TestCase
         foreach ($dataTypes as $typeConfig) {
             $testDataPoint = DataPoint::create([
                 'gateway_id' => $gateway->id,
-                'group_name' => 'Type_Tests',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => "Test {$typeConfig['type']}",
                 'modbus_function' => 4,
                 'register_address' => 1000 + rand(1, 100),

@@ -37,7 +37,9 @@ class ErrorHandlingIntegrationTest extends TestCase
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
             'label' => 'Test Point',
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
         ]);
     }
 
@@ -286,7 +288,7 @@ class ErrorHandlingIntegrationTest extends TestCase
         // Should include data point configuration when provided
         $this->assertArrayHasKey('data_point_config', $diagnosticInfo);
         $this->assertEquals($this->dataPoint->label, $diagnosticInfo['data_point_config']['label']);
-        $this->assertEquals($this->dataPoint->group_name, $diagnosticInfo['data_point_config']['group']);
+        $this->assertEquals($this->dataPoint->application, $diagnosticInfo['data_point_config']['application']);
     }
 
     protected function tearDown(): void

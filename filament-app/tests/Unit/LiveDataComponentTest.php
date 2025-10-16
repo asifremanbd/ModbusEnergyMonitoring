@@ -27,7 +27,9 @@ class LiveDataComponentTest extends TestCase
         
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Voltage L1',
             'data_type' => 'float32',
             'is_enabled' => true,
@@ -74,7 +76,7 @@ class LiveDataComponentTest extends TestCase
         
         $dataPoint = $dataPoints[0];
         $this->assertEquals('Test Gateway', $dataPoint['gateway_name']);
-        $this->assertEquals('Meter_1', $dataPoint['group_name']);
+        $this->assertEquals('Meter_1', $dataPoint['application']);
         $this->assertEquals('Voltage L1', $dataPoint['label']);
         $this->assertCount(10, $dataPoint['trend_data']);
         $this->assertEquals('up', $dataPoint['status']);
@@ -91,7 +93,9 @@ class LiveDataComponentTest extends TestCase
         
         DataPoint::factory()->create([
             'gateway_id' => $gateway2->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'is_enabled' => true,
         ]);
 
@@ -114,7 +118,9 @@ class LiveDataComponentTest extends TestCase
         // Create another data point in different group
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Current L1',
             'is_enabled' => true,
         ]);
@@ -125,11 +131,11 @@ class LiveDataComponentTest extends TestCase
         $this->assertCount(2, $component->get('dataPoints'));
         
         // Filter by Meter_1 group
-        $component->call('setFilter', 'group', 'Meter_1');
+        $component->call('setFilter', 'application', 'Meter_1');
         
         $dataPoints = $component->get('dataPoints');
         $this->assertCount(1, $dataPoints);
-        $this->assertEquals('Meter_1', $dataPoints[0]['group_name']);
+        $this->assertEquals('Meter_1', $dataPoints[0]['application']);
     }
 
     /** @test */
@@ -138,7 +144,9 @@ class LiveDataComponentTest extends TestCase
         // Create another data point with different data type
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Status',
             'data_type' => 'uint16',
             'is_enabled' => true,
@@ -178,17 +186,17 @@ class LiveDataComponentTest extends TestCase
         
         // Set multiple filters
         $component->call('setFilter', 'gateway', $this->gateway->id);
-        $component->call('setFilter', 'group', 'Meter_1');
+        $component->call('setFilter', 'application', 'Meter_1');
         
         $this->assertEquals($this->gateway->id, $component->get('filters')['gateway']);
-        $this->assertEquals('Meter_1', $component->get('filters')['group']);
+        $this->assertEquals('Meter_1', $component->get('filters')['application']);
         
         // Clear all filters
         $component->call('clearAllFilters');
         
         $filters = $component->get('filters');
         $this->assertNull($filters['gateway']);
-        $this->assertNull($filters['group']);
+        $this->assertNull($filters['application']);
         $this->assertNull($filters['tag']);
     }
 
@@ -236,7 +244,7 @@ class LiveDataComponentTest extends TestCase
         
         // Set some filters
         $component->call('setFilter', 'gateway', $this->gateway->id);
-        $component->call('setFilter', 'group', 'Meter_1');
+        $component->call('setFilter', 'application', 'Meter_1');
         
         $activeFilters = $component->get('activeFilters');
         
@@ -245,7 +253,7 @@ class LiveDataComponentTest extends TestCase
         $gatewayFilter = collect($activeFilters)->firstWhere('type', 'gateway');
         $this->assertEquals('Test Gateway', $gatewayFilter['label']);
         
-        $groupFilter = collect($activeFilters)->firstWhere('type', 'group');
+        $groupFilter = collect($activeFilters)->firstWhere('type', 'application');
         $this->assertEquals('Meter_1', $groupFilter['label']);
     }
 
@@ -255,7 +263,9 @@ class LiveDataComponentTest extends TestCase
         // Create disabled data point
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Disabled Point',
             'is_enabled' => false,
         ]);
@@ -280,7 +290,9 @@ class LiveDataComponentTest extends TestCase
         
         DataPoint::factory()->create([
             'gateway_id' => $inactiveGateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Inactive Point',
             'is_enabled' => true,
         ]);

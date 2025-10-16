@@ -232,13 +232,17 @@ class PastReadingsPerformanceTest extends TestCase
         $gateway2 = Gateway::factory()->create(['is_active' => true]);
         $dataPoint2 = DataPoint::factory()->create([
             'gateway_id' => $gateway2->id,
-            'group_name' => 'Group A',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'is_enabled' => true,
         ]);
         
         $dataPoint3 = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Group B',
+            'application' => 'automation',
+            'unit' => 'm³',
+            'load_type' => 'water',
             'is_enabled' => true,
         ]);
 
@@ -267,7 +271,7 @@ class PastReadingsPerformanceTest extends TestCase
         // Apply multiple filters
         $component = Livewire::test(PastReadings::class);
         $component->call('setFilter', 'gateway', $this->gateway->id);
-        $component->call('setFilter', 'group', 'Group B');
+        $component->call('setFilter', 'application', 'Group B');
         $component->call('setFilter', 'quality', 'uncertain');
         $component->set('filters.date_from', now()->subHours(12)->format('Y-m-d H:i'));
         $component->call('loadStatistics');

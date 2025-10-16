@@ -26,7 +26,126 @@ class CreateGateway extends CreateRecord
     {
         return $form
             ->schema([
-                Wizard::make($this->getSteps())
+                Forms\Components\Section::make('Quick Gateway Setup')
+                    ->description('Lightweight, single-step form to quickly add a new gateway into the system')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Name')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Enter unique gateway name')
+                            ->helperText('Unique and descriptive name for the gateway'),
+                        
+                        Forms\Components\TextInput::make('ip_address')
+                            ->label('IP Address')
+                            ->required()
+                            ->ip()
+                            ->placeholder('192.168.1.100')
+                            ->helperText('Static or public IP of the Teltonika gateway'),
+                        
+                        Forms\Components\TextInput::make('port')
+                            ->label('Port')
+                            ->required()
+                            ->numeric()
+                            ->default(502)
+                            ->minValue(1)
+                            ->maxValue(65535)
+                            ->placeholder('502')
+                            ->helperText('Modbus TCP port, default 502'),
+                        
+                        Forms\Components\TextInput::make('unit_id')
+                            ->label('Unit ID')
+                            ->required()
+                            ->numeric()
+                            ->default(1)
+                            ->minValue(1)
+                            ->maxValue(255)
+                            ->placeholder('1')
+                            ->helperText('Modbus slave/unit identifier, default 1'),
+                        
+                        Forms\Components\TextInput::make('poll_interval')
+                            ->label('Poll Interval (seconds)')
+                            ->required()
+                            ->numeric()
+                            ->default(120)
+                            ->minValue(10)
+                            ->maxValue(3600)
+                            ->placeholder('120')
+                            ->helperText('Poll frequency (e.g. 120 = every 2 minutes)'),
+                        
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Active')
+                            ->default(true)
+                            ->helperText('Enable polling for this gateway (default ON)'),
+                    ])
+                    ->columns(2)
+                    ->compact(),
+                
+                Forms\Components\Section::make('Connection Test')
+                    ->description('Test the connection before saving')
+                    ->schema([
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('test_connection')
+                                ->label('Test Connection')
+                                ->icon('heroicon-o-signal')
+                                ->color('primary')
+                                ->action(function (Forms\Get $get) {
+                                    $ipAddress = $get('ip_address');
+                                    $port = $get('port');
+                                    $unitId = $get('unit_id');
+                                    
+                                    $errors = [];
+                                    
+                                    if (empty($ipAddress) || !filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+                                        $errors[] = 'Valid IP address is required';
+                                    }
+                                    
+                                    if (empty($port) || !is_numeric($port) || $port < 1 || $port > 65535) {
+                                        $errors[] = 'Port must be a number between 1 and 65535';
+                                    }
+                                    
+                                    if (empty($unitId) || !is_numeric($unitId) || $unitId < 1 || $unitId > 255) {
+                                        $errors[] = 'Unit ID must be a number between 1 and 255';
+                                    }
+                                    
+                                    if (!empty($errors)) {
+                                        Notification::make()
+                                            ->title('Validation Error')
+                                            ->body(implode('. ', $errors))
+                                            ->warning()
+                                            ->send();
+                                        return;
+                                    }
+                                    
+                                    $pollService = app(ModbusPollService::class);
+                                    $result = $pollService->testConnection(
+                                        $ipAddress,
+                                        (int) $port,
+                                        (int) $unitId
+                                    );
+                                    
+                                    if ($result->success) {
+                                        Notification::make()
+                                            ->title('Connection Test Successful')
+                                            ->body("Latency: {$result->latency}ms" . ($result->testValue !== null ? ", Test register value: {$result->testValue}" : ''))
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Connection Test Failed')
+                                            ->body($result->error)
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }),
+                        ]),
+                        
+                        Forms\Components\Placeholder::make('note')
+                            ->content('💡 **Note:** Data points can be configured after creating the gateway. You can add them later through the edit form or use predefined templates.')
+                            ->extraAttributes(['class' => 'text-sm text-gray-600']),
+                    ])
+                    ->collapsible()
+                    ->collapsed(false),
             ]);
     }
 

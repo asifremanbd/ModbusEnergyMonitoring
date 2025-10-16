@@ -60,7 +60,9 @@ class ModbusCommunicationTest extends TestCase
         // Create data points for the gateway
         $dataPoint1 = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Voltage_L1',
             'modbus_function' => 4,
             'register_address' => 1,
@@ -71,7 +73,9 @@ class ModbusCommunicationTest extends TestCase
 
         $dataPoint2 = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Current_L1',
             'modbus_function' => 4,
             'register_address' => 3,

@@ -70,11 +70,11 @@ class PastReadings extends Component
             ->get(['id', 'name'])
             ->toArray();
         
-        // Load available groups
+        // Load available groups (applications)
         $this->availableFilters['groups'] = DataPoint::enabled()
             ->distinct()
-            ->orderBy('group_name')
-            ->pluck('group_name')
+            ->orderBy('application')
+            ->pluck('application')
             ->filter()
             ->toArray();
         
@@ -83,11 +83,13 @@ class PastReadings extends Component
             $this->availableFilters['data_points'] = DataPoint::enabled()
                 ->where('gateway_id', $this->filters['gateway'])
                 ->orderBy('label')
-                ->get(['id', 'label', 'group_name'])
+                ->get(['id', 'label', 'application', 'unit', 'load_type'])
                 ->map(function ($dp) {
+                    $application = ucfirst($dp->application ?: 'monitoring');
+                    $customLabel = $dp->label ?: 'Unnamed';
                     return [
                         'id' => $dp->id,
-                        'label' => $dp->group_name ? "{$dp->group_name} - {$dp->label}" : $dp->label,
+                        'label' => "({$application}) - {$customLabel}",
                     ];
                 })
                 ->toArray();
@@ -95,9 +97,11 @@ class PastReadings extends Component
             $this->availableFilters['data_points'] = DataPoint::enabled()
                 ->with('gateway:id,name')
                 ->orderBy('label')
-                ->get(['id', 'label', 'group_name', 'gateway_id'])
+                ->get(['id', 'label', 'application', 'unit', 'load_type', 'gateway_id'])
                 ->map(function ($dp) {
-                    $label = $dp->group_name ? "{$dp->group_name} - {$dp->label}" : $dp->label;
+                    $application = ucfirst($dp->application ?: 'monitoring');
+                    $customLabel = $dp->label ?: 'Unnamed';
+                    $label = "({$application}) - {$customLabel}";
                     return [
                         'id' => $dp->id,
                         'label' => "{$dp->gateway->name} - {$label}",
@@ -165,7 +169,7 @@ class PastReadings extends Component
         
         if ($this->filters['group']) {
             $query->whereHas('dataPoint', function ($q) {
-                $q->where('group_name', $this->filters['group']);
+                $q->where('application', $this->filters['group']);
             });
         }
         

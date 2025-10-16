@@ -78,7 +78,9 @@ class GatewayManagementInterfaceTest extends TestCase
             'is_active' => true,
             'data_points' => [
                 [
-                    'group_name' => 'Meter_1',
+                    'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                     'label' => 'Voltage',
                     'modbus_function' => 4,
                     'register_address' => 1,

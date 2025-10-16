@@ -30,7 +30,9 @@ class DuplicatePreventionTest extends TestCase
 
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'modbus_function' => 3,
             'register_address' => 1,
@@ -79,7 +81,9 @@ class DuplicatePreventionTest extends TestCase
         // Create second data point
         $dataPoint2 = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Test Group 2',
+            'application' => 'automation',
+            'unit' => 'm³',
+            'load_type' => 'water',
             'label' => 'Test Point 2',
             'modbus_function' => 3,
             'register_address' => 2,

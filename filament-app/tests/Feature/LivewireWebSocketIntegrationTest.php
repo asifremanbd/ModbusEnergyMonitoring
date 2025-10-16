@@ -162,13 +162,17 @@ class LivewireWebSocketIntegrationTest extends TestCase
         
         $dataPoint1 = DataPoint::factory()->create([
             'gateway_id' => $gateway1->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'is_enabled' => true,
         ]);
         
         $dataPoint2 = DataPoint::factory()->create([
             'gateway_id' => $gateway2->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'is_enabled' => true,
         ]);
 

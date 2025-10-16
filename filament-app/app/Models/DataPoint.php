@@ -13,7 +13,6 @@ class DataPoint extends Model
 
     protected $fillable = [
         'gateway_id',
-        'group_name',
         'application',
         'unit',
         'load_type',
@@ -61,11 +60,11 @@ class DataPoint extends Model
     }
 
     /**
-     * Scope to filter by group name.
+     * Scope to filter by application.
      */
-    public function scopeByGroup($query, string $groupName)
+    public function scopeByApplication($query, string $application)
     {
-        return $query->where('group_name', $groupName);
+        return $query->where('application', $application);
     }
 
     /**

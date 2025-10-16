@@ -52,11 +52,12 @@ class LiveData extends Component
             ->get(['id', 'name'])
             ->toArray();
         
-        // Load available groups
+        // Load available groups (applications)
         $this->availableFilters['groups'] = DataPoint::enabled()
             ->distinct()
-            ->orderBy('group_name')
-            ->pluck('group_name')
+            ->orderBy('application')
+            ->pluck('application')
+            ->filter()
             ->toArray();
         
         // Load available tags (data types as tags)
@@ -108,7 +109,7 @@ class LiveData extends Component
         }
         
         if ($this->filters['group']) {
-            $query->where('group_name', $this->filters['group']);
+            $query->where('application', $this->filters['group']);
         }
         
         if ($this->filters['tag']) {
@@ -116,7 +117,7 @@ class LiveData extends Component
         }
         
         $dataPoints = $query->orderBy('gateway_id')
-            ->orderBy('group_name')
+            ->orderBy('application')
             ->orderBy('label')
             ->get();
         
@@ -128,8 +129,11 @@ class LiveData extends Component
                 'id' => $dataPoint->id,
                 'gateway_name' => $dataPoint->gateway->name,
                 'gateway_id' => $dataPoint->gateway->id,
-                'group_name' => $dataPoint->group_name,
-                'label' => $dataPoint->label,
+                'application' => $dataPoint->application ?: 'monitoring',
+                'unit' => $dataPoint->unit ?: 'kWh',
+                'load_type' => $dataPoint->load_type ?: 'other',
+                'custom_label' => $dataPoint->label ?: 'Unnamed',
+                'display_label' => ucfirst($dataPoint->application ?: 'monitoring') . ' - ' . ($dataPoint->label ?: 'Unnamed'),
                 'data_type' => $dataPoint->data_type,
                 'register_address' => $dataPoint->register_address,
                 'current_value' => $latestReading ? $latestReading->display_value : 'N/A',
@@ -180,7 +184,7 @@ class LiveData extends Component
             $query->where('gateway_id', $this->filters['gateway']);
         }
         if ($this->filters['group']) {
-            $query->where('group_name', $this->filters['group']);
+            $query->where('application', $this->filters['group']);
         }
         if ($this->filters['tag']) {
             $query->where('data_type', $this->filters['tag']);

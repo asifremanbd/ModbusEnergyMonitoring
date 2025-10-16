@@ -69,7 +69,7 @@ class CompleteUserWorkflowTest extends TestCase
         foreach ($templateData['data_points'] as $pointData) {
             DataPoint::create([
                 'gateway_id' => $gateway->id,
-                'group_name' => $pointData['group_name'],
+                'application' => $pointData['application'],
                 'label' => $pointData['label'],
                 'modbus_function' => $pointData['modbus_function'],
                 'register_address' => $pointData['register_address'],
@@ -187,7 +187,9 @@ class CompleteUserWorkflowTest extends TestCase
         // User creates custom data point
         $dataPointData = [
             'gateway_id' => $gateway->id,
-            'group_name' => 'Custom_Group',
+            'application' => 'automation',
+            'unit' => 'kWh',
+            'load_type' => 'other',
             'label' => 'Custom Voltage',
             'modbus_function' => 4,
             'register_address' => 100,
@@ -214,7 +216,9 @@ class CompleteUserWorkflowTest extends TestCase
         // Verify cloned data point exists
         $this->assertDatabaseHas('data_points', [
             'gateway_id' => $gateway->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Custom Voltage',
             'register_address' => 200, // Original + offset
         ]);

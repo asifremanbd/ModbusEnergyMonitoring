@@ -271,13 +271,11 @@
                                 {{-- Data Point --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ $reading->dataPoint->label }}
+                                        ({{ ucfirst($reading->dataPoint->application ?: 'monitoring') }}) - {{ $reading->dataPoint->label ?: 'Unnamed' }}
                                     </div>
-                                    @if($reading->dataPoint->group_name)
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $reading->dataPoint->group_name }}
-                                        </div>
-                                    @endif
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $reading->dataPoint->unit ?: 'kWh' }} | {{ ucfirst($reading->dataPoint->load_type ?: 'other') }}
+                                    </div>
                                 </td>
                                 
                                 {{-- Scaled Value --}}

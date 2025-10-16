@@ -55,7 +55,7 @@ class PollingSystemCompleteTest extends TestCase
         // Create test data points
         $this->dataPoint1 = DataPoint::factory()->create([
             'gateway_id' => $this->enabledGateway->id,
-            'group_name' => 'Test_Group_1',
+            'application' => 'Test_Group_1',
             'label' => 'Voltage',
             'modbus_function' => 3,
             'register_address' => 1,
@@ -68,7 +68,7 @@ class PollingSystemCompleteTest extends TestCase
 
         $this->dataPoint2 = DataPoint::factory()->create([
             'gateway_id' => $this->enabledGateway->id,
-            'group_name' => 'Test_Group_1',
+            'application' => 'Test_Group_1',
             'label' => 'Current',
             'modbus_function' => 3,
             'register_address' => 3,
