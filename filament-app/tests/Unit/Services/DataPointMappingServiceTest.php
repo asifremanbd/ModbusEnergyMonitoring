@@ -26,7 +26,9 @@ class DataPointMappingServiceTest extends TestCase
     public function test_creates_data_point_with_valid_config()
     {
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'modbus_function' => 4,
@@ -39,7 +41,7 @@ class DataPointMappingServiceTest extends TestCase
 
         $this->assertInstanceOf(DataPoint::class, $dataPoint);
         $this->assertEquals($this->gateway->id, $dataPoint->gateway_id);
-        $this->assertEquals('Test Group', $dataPoint->group_name);
+        $this->assertEquals('Test Group', $dataPoint->application);
         $this->assertEquals('Test Point', $dataPoint->label);
         $this->assertEquals(100, $dataPoint->register_address);
         $this->assertEquals(4, $dataPoint->modbus_function);
@@ -52,7 +54,7 @@ class DataPointMappingServiceTest extends TestCase
     public function test_validates_required_fields()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Field 'group_name' is required");
+        $this->expectExceptionMessage("Field 'application' is required");
 
         $this->service->createDataPoint($this->gateway, [
             'label' => 'Test Point',
@@ -66,7 +68,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage("Field 'register_address' is required");
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 0, // Invalid - treated as empty
         ];
@@ -80,7 +84,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Register address must be between 1 and 65535');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => -1, // Invalid
         ];
@@ -94,7 +100,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Register address must be between 1 and 65535');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 65536, // Invalid
         ];
@@ -108,7 +116,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Modbus function must be 3 (Holding) or 4 (Input)');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'modbus_function' => 1, // Invalid
@@ -123,7 +133,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Invalid data type: invalid_type');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'data_type' => 'invalid_type',
@@ -138,7 +150,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Invalid byte order: invalid_order');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'byte_order' => 'invalid_order',
@@ -153,7 +167,9 @@ class DataPointMappingServiceTest extends TestCase
         $this->expectExceptionMessage('Scale factor must be a non-zero number');
 
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'scale_factor' => 0, // Invalid
@@ -165,7 +181,9 @@ class DataPointMappingServiceTest extends TestCase
     public function test_auto_calculates_register_count_based_on_data_type()
     {
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
             'data_type' => 'float64', // Should require 4 registers
@@ -178,7 +196,9 @@ class DataPointMappingServiceTest extends TestCase
     public function test_uses_default_values()
     {
         $config = [
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 100,
         ];
@@ -250,7 +270,9 @@ class DataPointMappingServiceTest extends TestCase
         
         foreach ($supportedTypes as $dataType) {
             $config = [
-                'group_name' => 'Test Group',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 100,
                 'data_type' => $dataType,
@@ -267,7 +289,9 @@ class DataPointMappingServiceTest extends TestCase
         
         foreach ($supportedOrders as $byteOrder) {
             $config = [
-                'group_name' => 'Test Group',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 100,
                 'byte_order' => $byteOrder,

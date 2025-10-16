@@ -148,7 +148,7 @@
                                 Gateway
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Group
+                                Application
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Data Point
@@ -179,20 +179,20 @@
                                     </div>
                                 </td>
                                 
-                                {{-- Group --}}
+                                {{-- Application --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 dark:text-white">
-                                        {{ $dataPoint['group_name'] }}
+                                        {{ ucfirst($dataPoint['application']) }}
                                     </div>
                                 </td>
                                 
                                 {{-- Data Point --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ $dataPoint['label'] }}
+                                        {{ $dataPoint['display_label'] }}
                                     </div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        Reg: {{ $dataPoint['register_address'] }} | {{ ucfirst($dataPoint['data_type']) }}
+                                        Reg: {{ $dataPoint['register_address'] }} | {{ ucfirst($dataPoint['data_type']) }} | {{ $dataPoint['unit'] }}
                                     </div>
                                 </td>
                                 

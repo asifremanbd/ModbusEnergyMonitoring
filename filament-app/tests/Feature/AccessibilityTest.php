@@ -28,7 +28,9 @@ class AccessibilityTest extends TestCase
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
             'label' => 'Test Data Point',
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
         ]);
 
         Reading::factory()->create([

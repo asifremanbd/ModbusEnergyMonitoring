@@ -33,7 +33,9 @@ class ErrorHandlingServiceTest extends TestCase
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
             'label' => 'Test Point',
-            'group_name' => 'Test Group',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
         ]);
     }
 
@@ -135,7 +137,7 @@ class ErrorHandlingServiceTest extends TestCase
         
         // Check data point config
         $this->assertEquals($this->dataPoint->label, $diagnosticInfo['data_point_config']['label']);
-        $this->assertEquals($this->dataPoint->group_name, $diagnosticInfo['data_point_config']['group']);
+        $this->assertEquals($this->dataPoint->application, $diagnosticInfo['data_point_config']['application']);
     }
 
     public function test_creates_error_notification()

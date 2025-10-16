@@ -50,7 +50,7 @@ class DataPointConfigurationTest extends TestCase
         
         // Verify first data point structure
         $firstPoint = $formData['data_points'][0];
-        $this->assertEquals('Basic', $firstPoint['group_name']);
+        $this->assertEquals('Basic', $firstPoint['application']);
         $this->assertEquals('Voltage', $firstPoint['label']);
         $this->assertEquals(4, $firstPoint['modbus_function']);
         $this->assertEquals(1, $firstPoint['register_address']);
@@ -66,7 +66,9 @@ class DataPointConfigurationTest extends TestCase
         // Set up some data points
         $dataPoints = [
             [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Point 1',
                 'modbus_function' => 4,
                 'register_address' => 1,
@@ -77,7 +79,9 @@ class DataPointConfigurationTest extends TestCase
                 'is_enabled' => true,
             ],
             [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Point 2',
                 'modbus_function' => 4,
                 'register_address' => 3,
@@ -116,7 +120,9 @@ class DataPointConfigurationTest extends TestCase
         // Set up source group
         $dataPoints = [
             [
-                'group_name' => 'Meter_1',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Meter_1 Voltage',
                 'modbus_function' => 4,
                 'register_address' => 1,
@@ -127,7 +133,9 @@ class DataPointConfigurationTest extends TestCase
                 'is_enabled' => true,
             ],
             [
-                'group_name' => 'Meter_1',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Meter_1 Current',
                 'modbus_function' => 4,
                 'register_address' => 3,
@@ -152,11 +160,11 @@ class DataPointConfigurationTest extends TestCase
         $this->assertCount(4, $formData['data_points']); // Original 2 + duplicated 2
         
         // Check duplicated points
-        $duplicatedPoints = array_filter($formData['data_points'], fn($p) => $p['group_name'] === 'Meter_2');
+        $duplicatedPoints = array_filter($formData['data_points'], fn($p) => $p['application'] === 'Meter_2');
         $this->assertCount(2, $duplicatedPoints);
         
         $duplicatedPoint = array_values($duplicatedPoints)[0];
-        $this->assertEquals('Meter_2', $duplicatedPoint['group_name']);
+        $this->assertEquals('Meter_2', $duplicatedPoint['application']);
         $this->assertEquals('Meter_2 Voltage', $duplicatedPoint['label']);
         $this->assertEquals(11, $duplicatedPoint['register_address']); // 1 + 10 offset
     }
@@ -175,7 +183,7 @@ class DataPointConfigurationTest extends TestCase
             'poll_interval' => 10,
             'data_points' => [
                 [
-                    'group_name' => '',  // Invalid: empty group name
+                    'application' => '',  // Invalid: empty group name
                     'label' => 'Test Point',
                     'modbus_function' => 4,
                     'register_address' => 70000, // Invalid: out of range
@@ -191,7 +199,7 @@ class DataPointConfigurationTest extends TestCase
         $component->call('create');
         
         // Should have validation errors
-        $component->assertHasFormErrors(['data_points.0.group_name', 'data_points.0.register_address']);
+        $component->assertHasFormErrors(['data_points.0.application', 'data_points.0.register_address']);
     }
 
     /** @test */
@@ -221,7 +229,9 @@ class DataPointConfigurationTest extends TestCase
             'poll_interval' => 10,
             'data_points' => [
                 [
-                    'group_name' => 'Test',
+                    'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                     'label' => 'Test Point',
                     'modbus_function' => 4,
                     'register_address' => 1,
@@ -255,7 +265,9 @@ class DataPointConfigurationTest extends TestCase
             'is_active' => true,
             'data_points' => [
                 [
-                    'group_name' => 'Test',
+                    'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                     'label' => 'Voltage',
                     'modbus_function' => 4,
                     'register_address' => 1,
@@ -266,7 +278,9 @@ class DataPointConfigurationTest extends TestCase
                     'is_enabled' => true,
                 ],
                 [
-                    'group_name' => 'Test',
+                    'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                     'label' => 'Current',
                     'modbus_function' => 4,
                     'register_address' => 3,
@@ -294,7 +308,7 @@ class DataPointConfigurationTest extends TestCase
         $this->assertCount(2, $gateway->dataPoints);
         
         $dataPoint = $gateway->dataPoints->first();
-        $this->assertEquals('Test', $dataPoint->group_name);
+        $this->assertEquals('Test', $dataPoint->application);
         $this->assertEquals('Voltage', $dataPoint->label);
         $this->assertEquals(4, $dataPoint->modbus_function);
         $this->assertEquals(1, $dataPoint->register_address);
@@ -330,7 +344,9 @@ class DataPointConfigurationTest extends TestCase
         
         $dataPoints = [
             [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Voltage',
                 'modbus_function' => 4,
                 'register_address' => 1,

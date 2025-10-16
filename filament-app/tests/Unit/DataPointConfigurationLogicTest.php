@@ -40,14 +40,14 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Check first data point structure
         $firstPoint = $template['data_points'][0];
-        $this->assertArrayHasKey('group_name', $firstPoint);
+        $this->assertArrayHasKey('application', $firstPoint);
         $this->assertArrayHasKey('label', $firstPoint);
         $this->assertArrayHasKey('modbus_function', $firstPoint);
         $this->assertArrayHasKey('register_address', $firstPoint);
         $this->assertArrayHasKey('data_type', $firstPoint);
         $this->assertArrayHasKey('byte_order', $firstPoint);
         
-        $this->assertEquals('Basic', $firstPoint['group_name']);
+        $this->assertEquals('Basic', $firstPoint['application']);
         $this->assertEquals(4, $firstPoint['modbus_function']);
         $this->assertEquals('float32', $firstPoint['data_type']);
         $this->assertEquals('word_swapped', $firstPoint['byte_order']);
@@ -60,7 +60,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Valid configuration
         $validConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
             'modbus_function' => 4,
@@ -74,7 +76,7 @@ class DataPointConfigurationLogicTest extends TestCase
         $result = $mappingService->validateDataPointConfig($validConfig);
         
         $this->assertIsArray($result);
-        $this->assertEquals('Test', $result['group_name']);
+        $this->assertEquals('Test', $result['application']);
         $this->assertEquals('Test Point', $result['label']);
         $this->assertEquals(1, $result['register_address']);
         $this->assertEquals(4, $result['modbus_function']);
@@ -91,7 +93,9 @@ class DataPointConfigurationLogicTest extends TestCase
         $mappingService = new DataPointMappingService();
         
         $invalidConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 70000, // Invalid: out of range
         ];
@@ -109,11 +113,11 @@ class DataPointConfigurationLogicTest extends TestCase
         
         $invalidConfig = [
             'label' => 'Test Point',
-            // Missing group_name and register_address
+            // Missing application and register_address
         ];
         
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Field 'group_name' is required");
+        $this->expectExceptionMessage("Field 'application' is required");
         
         $mappingService->validateDataPointConfig($invalidConfig);
     }
@@ -124,7 +128,9 @@ class DataPointConfigurationLogicTest extends TestCase
         $mappingService = new DataPointMappingService();
         
         $minimalConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
         ];
@@ -149,7 +155,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         foreach ($validDataTypes as $dataType) {
             $config = [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 1,
                 'data_type' => $dataType,
@@ -161,7 +169,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Test invalid data type
         $invalidConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
             'data_type' => 'invalid_type',
@@ -182,7 +192,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         foreach ($validByteOrders as $byteOrder) {
             $config = [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 1,
                 'byte_order' => $byteOrder,
@@ -194,7 +206,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Test invalid byte order
         $invalidConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
             'byte_order' => 'invalid_order',
@@ -214,7 +228,9 @@ class DataPointConfigurationLogicTest extends TestCase
         // Valid functions
         foreach ([3, 4] as $function) {
             $config = [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 1,
                 'modbus_function' => $function,
@@ -226,7 +242,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Invalid function
         $invalidConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
             'modbus_function' => 1, // Invalid
@@ -246,7 +264,9 @@ class DataPointConfigurationLogicTest extends TestCase
         // Valid scale factors
         foreach ([0.1, 1.0, 10.0, 1000.0] as $scale) {
             $config = [
-                'group_name' => 'Test',
+                'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
                 'label' => 'Test Point',
                 'register_address' => 1,
                 'scale_factor' => $scale,
@@ -258,7 +278,9 @@ class DataPointConfigurationLogicTest extends TestCase
         
         // Invalid scale factor (zero)
         $invalidConfig = [
-            'group_name' => 'Test',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Test Point',
             'register_address' => 1,
             'scale_factor' => 0,

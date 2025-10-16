@@ -40,7 +40,9 @@ class ModbusPollServiceTest extends TestCase
         // Create test data point
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Voltage_L1',
             'modbus_function' => 4,
             'register_address' => 1,

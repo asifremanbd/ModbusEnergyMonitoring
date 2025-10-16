@@ -104,7 +104,9 @@ class TeltonikaTemplateServiceTest extends TestCase
         // Create source group
         $sourcePoints = DataPoint::factory()->count(3)->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
         ]);
         
         $clonedPoints = $this->service->cloneGroup(
@@ -119,7 +121,7 @@ class TeltonikaTemplateServiceTest extends TestCase
         foreach ($clonedPoints as $index => $clonedPoint) {
             $sourcePoint = $sourcePoints[$index];
             
-            $this->assertEquals('Meter_2', $clonedPoint->group_name);
+            $this->assertEquals('Meter_2', $clonedPoint->application);
             $this->assertEquals(
                 str_replace('Meter_1', 'Meter_2', $sourcePoint->label),
                 $clonedPoint->label
@@ -146,21 +148,21 @@ class TeltonikaTemplateServiceTest extends TestCase
         // Create points with registers 10-11, 15-16, 20-21
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Test_Group',
+            'application' => 'Test_Group',
             'register_address' => 10,
             'register_count' => 2,
         ]);
         
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Test_Group',
+            'application' => 'Test_Group',
             'register_address' => 15,
             'register_count' => 2,
         ]);
         
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Test_Group',
+            'application' => 'Test_Group',
             'register_address' => 20,
             'register_count' => 2,
         ]);
@@ -215,7 +217,7 @@ class TeltonikaTemplateServiceTest extends TestCase
         
         $firstPoint = $template['data_points'][0];
         $requiredFields = [
-            'group_name', 'label', 'modbus_function', 'register_address',
+            'application', 'label', 'modbus_function', 'register_address',
             'register_count', 'data_type', 'byte_order', 'scale_factor', 'is_enabled'
         ];
         
@@ -233,7 +235,7 @@ class TeltonikaTemplateServiceTest extends TestCase
         
         // Check that all points use expected defaults
         foreach ($template['data_points'] as $point) {
-            $this->assertEquals('Basic', $point['group_name']);
+            $this->assertEquals('Basic', $point['application']);
             $this->assertEquals(4, $point['modbus_function']); // Input registers
             $this->assertEquals(2, $point['register_count']); // float32
             $this->assertEquals('float32', $point['data_type']);

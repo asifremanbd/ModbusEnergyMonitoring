@@ -31,7 +31,9 @@ class LiveDataInterfaceTest extends TestCase
         
         $this->dataPoint = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Voltage L1',
             'data_type' => 'float32',
             'is_enabled' => true,
@@ -101,7 +103,9 @@ class LiveDataInterfaceTest extends TestCase
         // Create data point in different group
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Current L1',
             'is_enabled' => true,
         ]);
@@ -121,7 +125,9 @@ class LiveDataInterfaceTest extends TestCase
         // Create data point with different data type
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Status',
             'data_type' => 'uint16',
             'is_enabled' => true,
@@ -218,7 +224,9 @@ class LiveDataInterfaceTest extends TestCase
         // Create data point without readings
         $dataPointNoReadings = DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_2',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'No Data Point',
             'is_enabled' => true,
         ]);
@@ -257,7 +265,9 @@ class LiveDataInterfaceTest extends TestCase
         // Create disabled data point
         DataPoint::factory()->create([
             'gateway_id' => $this->gateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Disabled Point',
             'is_enabled' => false,
         ]);
@@ -281,7 +291,9 @@ class LiveDataInterfaceTest extends TestCase
         
         DataPoint::factory()->create([
             'gateway_id' => $inactiveGateway->id,
-            'group_name' => 'Meter_1',
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'label' => 'Inactive Point',
             'is_enabled' => true,
         ]);

@@ -1,115 +1,54 @@
-# Deployment Guide for Filament App
+# Production Deployment Guide
 
-## Server Details
-- **IP**: 165.22.112.94
-- **User**: root
-- **Password**: 2tDEoBWefYLp.PYyPF
+## Latest Update: Enhanced Dashboard (Oct 15, 2025)
 
-## SSH Key Setup (✅ CONFIGURED)
+### What's New:
+- Enhanced dashboard with smart data fallback (recent → historical)
+- Improved KPI calculations and success rate handling  
+- Added weekly meter cards with energy consumption tracking
+- Better error handling and empty state management
+- Real-time updates via WebSocket events
+- Graceful degradation when no recent data available
 
-SSH key authentication is now set up! You can connect without entering the password.
+### Deploy to Production Server:
 
-### Quick Connect Commands
-```bash
-# Connect using SSH alias
-ssh deploy-server
+1. **SSH into your production server**
+2. **Navigate to your application directory**
+   ```bash
+   cd /path/to/your/filament-app
+   ```
 
-# Or connect directly
-ssh -i ~/.ssh/id_rsa_deploy root@165.22.112.94
-```
+3. **Pull the latest changes**
+   ```bash
+   git pull origin main
+   ```
 
-### Setup Details (Already Done)
-1. ✅ SSH key generated: `~/.ssh/id_rsa_deploy`
-2. ✅ Public key copied to server
-3. ✅ SSH config created for easy access
-4. ✅ Server configured for key authentication
+4. **Clear application cache** (if needed)
+   ```bash
+   php artisan cache:clear
+   php artisan config:clear
+   php artisan view:clear
+   ```
 
-### SSH Config Location
-- Windows: `C:\Users\[Username]\.ssh\config`
-- Contains alias `deploy-server` for easy connection
+5. **Restart services** (if using queue workers or supervisord)
+   ```bash
+   sudo supervisorctl restart all
+   # or
+   php artisan queue:restart
+   ```
 
-## Prerequisites on Ubuntu Server
+### Files Updated:
+- `app/Livewire/Dashboard.php` - Enhanced dashboard logic
+- `app/Models/Gateway.php` - Gateway model improvements
+- `app/Models/Reading.php` - Reading model enhancements  
+- `resources/views/livewire/dashboard.blade.php` - Dashboard view updates
 
-### 1. Install Required Software
-```bash
-# Update system
-apt update && apt upgrade -y
+### No Database Changes Required
+This update only modifies application logic, no migrations needed.
 
-# Install Nginx
-apt install nginx -y
-
-# Install PHP 8.1+ and extensions
-apt install php8.1-fpm php8.1-mysql php8.1-xml php8.1-curl php8.1-zip php8.1-mbstring php8.1-gd php8.1-bcmath php8.1-intl -y
-
-# Install MySQL
-apt install mysql-server -y
-
-# Install Composer
-curl -sS https://getcomposer.org/installer | php
-mv composer.phar /usr/local/bin/composer
-
-# Install Node.js and npm
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt install nodejs -y
-```
-
-### 2. Configure MySQL
-```bash
-# Secure MySQL installation
-mysql_secure_installation
-
-# Create database and user
-mysql -u root -p
-```
-
-```sql
-CREATE DATABASE filament_app;
-CREATE USER 'filament_user'@'localhost' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON filament_app.* TO 'filament_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-## Deployment Steps
-
-### 1. Upload Application Files
-```bash
-# Create application directory
-mkdir -p /var/www/filament-app
-
-# Set proper ownership
-chown -R www-data:www-data /var/www/filament-app
-```
-
-### 2. Configure Environment
-Copy the production environment file and update database credentials.
-
-### 3. Install Dependencies
-```bash
-cd /var/www/filament-app
-composer install --optimize-autoloader --no-dev
-npm install && npm run build
-```
-
-### 4. Set Permissions
-```bash
-chown -R www-data:www-data /var/www/filament-app
-chmod -R 755 /var/www/filament-app
-chmod -R 775 /var/www/filament-app/storage
-chmod -R 775 /var/www/filament-app/bootstrap/cache
-```
-
-### 5. Run Laravel Commands
-```bash
-php artisan key:generate
-php artisan migrate --force
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-## Next Steps
-1. Run the deployment script
-2. Configure Nginx
-3. Set up SSL certificate
-4. Configure firewall
+### Verification:
+After deployment, check:
+- Dashboard loads properly
+- KPIs display correctly
+- Weekly meter cards show data
+- No errors in application logs

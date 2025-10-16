@@ -26,7 +26,7 @@ class PastReadingsUnitTest extends TestCase
         // Test with empty filters
         $component->filters = [
             'gateway' => null,
-            'group' => null,
+            'application' => null,
             'data_point' => null,
             'quality' => null,
             'date_from' => null,
@@ -59,7 +59,7 @@ class PastReadingsUnitTest extends TestCase
         
         $expectedFilters = [
             'gateway' => null,
-            'group' => null,
+            'application' => null,
             'data_point' => null,
             'quality' => null,
             'date_from' => null,

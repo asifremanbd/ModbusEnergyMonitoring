@@ -17,25 +17,27 @@ class DataPointFactory extends Factory
     public function definition(): array
     {
         $energyMetrics = [
-            ['group' => 'Meter_1', 'label' => 'Active Power L1', 'register' => 1000],
-            ['group' => 'Meter_1', 'label' => 'Active Power L2', 'register' => 1002],
-            ['group' => 'Meter_1', 'label' => 'Active Power L3', 'register' => 1004],
-            ['group' => 'Meter_1', 'label' => 'Voltage L1', 'register' => 1100],
-            ['group' => 'Meter_1', 'label' => 'Voltage L2', 'register' => 1102],
-            ['group' => 'Meter_1', 'label' => 'Voltage L3', 'register' => 1104],
-            ['group' => 'Meter_1', 'label' => 'Current L1', 'register' => 1200],
-            ['group' => 'Meter_1', 'label' => 'Current L2', 'register' => 1202],
-            ['group' => 'Meter_1', 'label' => 'Current L3', 'register' => 1204],
-            ['group' => 'Meter_2', 'label' => 'Active Power L1', 'register' => 2000],
-            ['group' => 'Meter_2', 'label' => 'Active Power L2', 'register' => 2002],
-            ['group' => 'Meter_2', 'label' => 'Active Power L3', 'register' => 2004],
+            ['application' => 'monitoring', 'label' => 'Active Power L1', 'register' => 1000, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Active Power L2', 'register' => 1002, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Active Power L3', 'register' => 1004, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Voltage L1', 'register' => 1100, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Voltage L2', 'register' => 1102, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Voltage L3', 'register' => 1104, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Current L1', 'register' => 1200, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Current L2', 'register' => 1202, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'monitoring', 'label' => 'Current L3', 'register' => 1204, 'unit' => 'kWh', 'load_type' => 'power'],
+            ['application' => 'automation', 'label' => 'Water Flow L1', 'register' => 2000, 'unit' => 'm³', 'load_type' => 'water'],
+            ['application' => 'automation', 'label' => 'Water Flow L2', 'register' => 2002, 'unit' => 'm³', 'load_type' => 'water'],
+            ['application' => 'automation', 'label' => 'Water Flow L3', 'register' => 2004, 'unit' => 'm³', 'load_type' => 'water'],
         ];
 
         $metric = $this->faker->randomElement($energyMetrics);
 
         return [
             'gateway_id' => \App\Models\Gateway::factory(),
-            'group_name' => $metric['group'],
+            'application' => $metric['application'],
+            'unit' => $metric['unit'],
+            'load_type' => $metric['load_type'],
             'label' => $metric['label'],
             'modbus_function' => $this->faker->randomElement([3, 4]), // Holding or Input registers
             'register_address' => $metric['register'],
@@ -68,7 +70,9 @@ class DataPointFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'label' => 'Voltage L' . $this->faker->numberBetween(1, 3),
-            'group_name' => 'Meter_' . $this->faker->numberBetween(1, 3),
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'register_address' => $this->faker->numberBetween(1100, 1110),
             'data_type' => 'float32',
             'scale_factor' => 0.1,
@@ -82,7 +86,9 @@ class DataPointFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'label' => 'Active Power L' . $this->faker->numberBetween(1, 3),
-            'group_name' => 'Meter_' . $this->faker->numberBetween(1, 3),
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'register_address' => $this->faker->numberBetween(1000, 1010),
             'data_type' => 'float32',
             'scale_factor' => 1.0,
@@ -96,7 +102,9 @@ class DataPointFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'label' => 'Current L' . $this->faker->numberBetween(1, 3),
-            'group_name' => 'Meter_' . $this->faker->numberBetween(1, 3),
+            'application' => 'monitoring',
+            'unit' => 'kWh',
+            'load_type' => 'power',
             'register_address' => $this->faker->numberBetween(1200, 1210),
             'data_type' => 'float32',
             'scale_factor' => 0.01,

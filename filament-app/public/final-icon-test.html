@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Icon Test</title>
+</head>
+<body>
+    <h1>Final Icon Test</h1>
+    
+    <h2>Test 1: Root level icon</h2>
+    <img src="/test-icon.png" width="50" height="50" style="border: 2px solid green;">
+    <p>If you see an icon above, the web server is working</p>
+    
+    <h2>Test 2: Icons in subfolder</h2>
+    <img src="/images/icons/power-meter.png" width="50" height="50" style="border: 2px solid red;">
+    <img src="/images/icons/supply.png" width="50" height="50" style="border: 2px solid red;">
+    <p>If you see icons above, the subfolder path is working</p>
+    
+    <h2>Test 3: Direct links</h2>
+    <p><a href="/test-icon.png" target="_blank">Test root icon</a></p>
+    <p><a href="/images/icons/power-meter.png" target="_blank">Test subfolder icon</a></p>
+    
+    <h2>Current URL</h2>
+    <p id="url"></p>
+    
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+    </script>
+</body>
+</html>

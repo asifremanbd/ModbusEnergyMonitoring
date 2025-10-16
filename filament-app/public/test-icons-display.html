@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .icon-test { display: inline-block; margin: 10px; text-align: center; border: 1px solid #ddd; padding: 10px; }
+        .icon-test img { width: 40px; height: 40px; display: block; margin: 0 auto 5px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Widget Icons Test - Relative Paths</h1>
+    <p>Testing icon accessibility with relative paths (same as widget uses)</p>
+    
+    <div class="icon-test">
+        <img src="/images/icons/power-meter.png" alt="Power" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Power</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/water-meter.png" alt="Water" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Water</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/supply.png" alt="Socket" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Socket</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/radiator.png" alt="Radiator" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Radiator</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/fan.png" alt="Fan" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Fan</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/faucet.png" alt="Faucet" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Faucet</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/electric-meter.png" alt="AC" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">AC</div>
+    </div>
+    
+    <div class="icon-test">
+        <img src="/images/icons/statistics.png" alt="Other" onerror="this.nextSibling.innerHTML='❌ Failed'; this.nextSibling.className='error';">
+        <div class="success">Other</div>
+    </div>
+    
+    <hr>
+    <h2>Debug Info</h2>
+    <p>Current URL: <span id="currentUrl"></span></p>
+    <p>Test one icon directly: <a href="/images/icons/power-meter.png" target="_blank">/images/icons/power-meter.png</a></p>
+    
+    <script>
+        document.getElementById('currentUrl').textContent = window.location.href;
+    </script>
+</body>
+</html>

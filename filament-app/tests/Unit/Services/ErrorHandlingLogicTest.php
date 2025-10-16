@@ -221,7 +221,7 @@ class ErrorHandlingLogicTest extends TestCase
         $dataPoint->id = 1;
         $dataPoint->gateway_id = 1;
         $dataPoint->label = 'Test Point';
-        $dataPoint->group_name = 'Test Group';
+        $dataPoint->application = 'Test Group';
         $dataPoint->modbus_function = 4;
         $dataPoint->register_address = 1000;
         $dataPoint->register_count = 2;
