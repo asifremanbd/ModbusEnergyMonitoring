@@ -62,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                \App\Filament\Widgets\GatewaysOverview::class,
+                \App\Filament\Widgets\WeeklyMeterCards::class,
                 Widgets\AccountWidget::class,
             ])
             ->middleware([

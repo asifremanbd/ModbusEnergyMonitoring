@@ -8,8 +8,6 @@ class Dashboard extends BaseDashboard
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
     
-    protected static string $view = 'filament.pages.dashboard';
-    
     public function getTitle(): string
     {
         return 'Gateway Monitor Dashboard';
