@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('Teltonika Gateway Monitor')
+            ->brandName('Teltonika Modbus Monitor')
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-home')
                     ->activeIcon('heroicon-s-home')
                     ->sort(1),
-                NavigationItem::make('Gateways')
+                NavigationItem::make('Modbus Registrations')
                     ->url('/admin/gateways')
                     ->icon('heroicon-o-server')
                     ->activeIcon('heroicon-s-server')

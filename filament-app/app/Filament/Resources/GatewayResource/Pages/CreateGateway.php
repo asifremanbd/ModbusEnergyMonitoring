@@ -26,22 +26,22 @@ class CreateGateway extends CreateRecord
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Quick Gateway Setup')
-                    ->description('Lightweight, single-step form to quickly add a new gateway into the system')
+                Forms\Components\Section::make('Quick Modbus Registration Setup')
+                    ->description('Lightweight, single-step form to quickly add a new Modbus registration into the system')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Enter unique gateway name')
-                            ->helperText('Unique and descriptive name for the gateway'),
+                            ->placeholder('Enter unique registration name')
+                            ->helperText('Unique and descriptive name for the Modbus registration'),
                         
                         Forms\Components\TextInput::make('ip_address')
                             ->label('IP Address')
                             ->required()
                             ->ip()
                             ->placeholder('192.168.1.100')
-                            ->helperText('Static or public IP of the Teltonika gateway'),
+                            ->helperText('Static or public IP of the Teltonika device'),
                         
                         Forms\Components\TextInput::make('port')
                             ->label('Port')
@@ -76,7 +76,7 @@ class CreateGateway extends CreateRecord
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
                             ->default(true)
-                            ->helperText('Enable polling for this gateway (default ON)'),
+                            ->helperText('Enable polling for this registration (default ON)'),
                     ])
                     ->columns(2)
                     ->compact(),
@@ -141,7 +141,7 @@ class CreateGateway extends CreateRecord
                         ]),
                         
                         Forms\Components\Placeholder::make('note')
-                            ->content('💡 **Note:** Data points can be configured after creating the gateway. You can add them later through the edit form or use predefined templates.')
+                            ->content('💡 **Note:** Data points can be configured after creating the registration. You can add them later through the edit form or use predefined templates.')
                             ->extraAttributes(['class' => 'text-sm text-gray-600']),
                     ])
                     ->collapsible()
@@ -155,20 +155,20 @@ class CreateGateway extends CreateRecord
             Step::make('Connect')
                 ->description('Configure gateway connection')
                 ->schema([
-                    Forms\Components\Section::make('Gateway Connection Settings')
+                    Forms\Components\Section::make('Modbus Registration Connection Settings')
                         ->schema([
                             Forms\Components\TextInput::make('name')
                                 ->required()
                                 ->maxLength(255)
-                                ->placeholder('Enter gateway name')
-                                ->helperText('A descriptive name for this gateway'),
+                                ->placeholder('Enter registration name')
+                                ->helperText('A descriptive name for this Modbus registration'),
                             
                             Forms\Components\TextInput::make('ip_address')
                                 ->label('IP Address')
                                 ->required()
                                 ->ip()
                                 ->placeholder('192.168.1.100')
-                                ->helperText('IP address of the Teltonika gateway'),
+                                ->helperText('IP address of the Teltonika device'),
                             
                             Forms\Components\TextInput::make('port')
                                 ->required()
@@ -197,7 +197,7 @@ class CreateGateway extends CreateRecord
                                 ->minValue(1)
                                 ->maxValue(3600)
                                 ->placeholder('10')
-                                ->helperText('How often to poll this gateway (1-3600 seconds)'),
+                                ->helperText('How often to poll this registration (1-3600 seconds)'),
                         ])
                         ->columns(2),
                     

@@ -49,7 +49,10 @@ class WeeklyMeterCards extends Widget
                     'label' => $dataPoint->label,
                     'unit' => $dataPoint->unit ?? 'None',
                     'total_usage' => $historicalData['totalUsage'] ?? 0,
-                    'daily_average' => $historicalData['dailyAverage'] ?? 0,
+                    'today_usage' => $historicalData['todayUsage'] ?? 0,
+                    'weekly_total' => $historicalData['weeklyTotal'] ?? 0,
+                    'weekly_average' => $historicalData['weeklyAverage'] ?? 0,
+                    'current_value' => $historicalData['currentValue'] ?? 0,
                     'icon' => $iconMap[$dataPoint->load_type] ?? 'statistics.png',
                     'load_type' => $dataPoint->load_type ?? 'other',
                     'has_readings' => $dataPoint->readings->count() > 0,
@@ -73,7 +76,10 @@ class WeeklyMeterCards extends Widget
         if ($readings->count() === 0) {
             return [
                 'totalUsage' => 0,
-                'dailyAverage' => 0,
+                'todayUsage' => 0,
+                'weeklyTotal' => 0,
+                'weeklyAverage' => 0,
+                'currentValue' => 0,
                 'lastReadingDate' => null,
                 'dataPeriod' => null,
                 'status' => 'no_data',
@@ -94,50 +100,84 @@ class WeeklyMeterCards extends Widget
             $status = 'recent';
         }
         
-        // Try to get a week's worth of data, but use whatever is available
-        $weekAgoTarget = now()->subDays(7);
-        $recentReadings = $sortedReadings->filter(function ($reading) use ($weekAgoTarget) {
-            return $reading->read_at >= $weekAgoTarget;
+        // Calculate different time periods
+        $now = now();
+        $todayStart = $now->copy()->startOfDay();
+        $weekStart = $now->copy()->startOfWeek();
+        
+        // Get readings for different periods
+        $todayReadings = $sortedReadings->filter(function ($reading) use ($todayStart) {
+            return $reading->read_at >= $todayStart;
         });
         
-        // If no recent readings, use the most recent available data
-        if ($recentReadings->count() < 2) {
-            $recentReadings = $sortedReadings->take(-30); // Last 30 readings
-        }
+        $weekReadings = $sortedReadings->filter(function ($reading) use ($weekStart) {
+            return $reading->read_at >= $weekStart;
+        });
         
+        // Calculate total usage (all time)
         $totalUsage = 0;
-        $dailyAverage = 0;
-        $dataPeriod = 'No data';
-        
-        if ($recentReadings->count() >= 2) {
-            $firstReading = $recentReadings->first();
-            $lastReading = $recentReadings->last();
+        if ($sortedReadings->count() >= 2) {
+            $firstReading = $sortedReadings->first();
+            $lastReading = $sortedReadings->last();
             
-            // Calculate usage for cumulative meters
             if ($lastReading->scaled_value !== null && 
                 $firstReading->scaled_value !== null && 
                 $lastReading->scaled_value >= $firstReading->scaled_value) {
                 $totalUsage = $lastReading->scaled_value - $firstReading->scaled_value;
-                
-                // Calculate daily average based on actual time period
-                $daysDiff = $firstReading->read_at->diffInDays($lastReading->read_at);
-                if ($daysDiff > 0) {
-                    $dailyAverage = $totalUsage / $daysDiff;
-                    $dataPeriod = $daysDiff . ' days';
-                } else {
-                    $dailyAverage = $totalUsage;
-                    $dataPeriod = '< 1 day';
-                }
             }
         } elseif ($readings->count() === 1) {
-            // Single reading - show the value as current reading
             $totalUsage = $lastReading->scaled_value ?? 0;
-            $dataPeriod = 'Single reading';
         }
+        
+        // Calculate today's usage
+        $todayUsage = 0;
+        if ($todayReadings->count() >= 2) {
+            $firstTodayReading = $todayReadings->first();
+            $lastTodayReading = $todayReadings->last();
+            
+            if ($lastTodayReading->scaled_value !== null && 
+                $firstTodayReading->scaled_value !== null && 
+                $lastTodayReading->scaled_value >= $firstTodayReading->scaled_value) {
+                $todayUsage = $lastTodayReading->scaled_value - $firstTodayReading->scaled_value;
+            }
+        }
+        
+        // Calculate weekly total
+        $weeklyTotal = 0;
+        if ($weekReadings->count() >= 2) {
+            $firstWeekReading = $weekReadings->first();
+            $lastWeekReading = $weekReadings->last();
+            
+            if ($lastWeekReading->scaled_value !== null && 
+                $firstWeekReading->scaled_value !== null && 
+                $lastWeekReading->scaled_value >= $firstWeekReading->scaled_value) {
+                $weeklyTotal = $lastWeekReading->scaled_value - $firstWeekReading->scaled_value;
+            }
+        }
+        
+        // Calculate weekly average (based on weekly data)
+        $weeklyAverage = 0;
+        if ($weekReadings->count() >= 2) {
+            $firstWeekReading = $weekReadings->first();
+            $daysDiff = $firstWeekReading->read_at->diffInDays($now);
+            if ($daysDiff > 0) {
+                $weeklyAverage = $weeklyTotal / $daysDiff;
+            } else {
+                $weeklyAverage = $weeklyTotal;
+            }
+        }
+        
+        // Get current reading value (for amps or other instantaneous values)
+        $currentValue = $lastReading->scaled_value ?? 0;
+        
+        $dataPeriod = $sortedReadings->count() . ' readings';
         
         return [
             'totalUsage' => round($totalUsage, 2),
-            'dailyAverage' => round($dailyAverage, 2),
+            'todayUsage' => round($todayUsage, 2),
+            'weeklyTotal' => round($weeklyTotal, 2),
+            'weeklyAverage' => round($weeklyAverage, 2),
+            'currentValue' => round($currentValue, 2),
             'lastReadingDate' => $lastReadingDate,
             'dataPeriod' => $dataPeriod,
             'status' => $status,

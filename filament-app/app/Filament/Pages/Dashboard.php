@@ -10,12 +10,12 @@ class Dashboard extends BaseDashboard
     
     public function getTitle(): string
     {
-        return 'Gateway Monitor Dashboard';
+        return 'Modbus Monitor Dashboard';
     }
     
     public function getHeading(): string
     {
-        return 'Teltonika Gateway Monitor';
+        return 'Teltonika Modbus Monitor';
     }
     
     public function getSubheading(): ?string
