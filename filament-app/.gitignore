@@ -50,5 +50,12 @@ Thumbs.db
 /.idea
 /.vscode
 
-# Kiro development specs (keep local only)
-/.kiro/specs/
+# Ignore all markdown and script files
+*.md
+*.sh
+*.bat
+*.ps1
+*.txt
+
+# Ignore hidden local folders
+.kiro/
