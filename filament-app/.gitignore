@@ -1,19 +1,51 @@
-/.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/vendor
+# Laravel / PHP
+/vendor/
 .env
-.env.backup
-.env.production
+.env.*.local
+.phpunit.cache
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
-auth.json
-npm-debug.log
-yarn-error.log
+.phpstorm.meta.php
+.idea/
+*.iml
+
+# Storage & cache
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Node / build
+/node_modules/
+/public/hot
+/public/build
+/public/storage
+/.vite
+/.eslintcache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc dumps & scripts
+*.sql
+*.sqlite
+*.bak
+*.dump
+/check_admin.php
+/debug-users-route.php
+/essential_data.sql
+/backup.sql
+/laravel_app_backup.sql
+/setup-test-db.sql
+/test-*.php
+/list-users.php
+/check_endian.php
+
+# IDE
 /.fleet
 /.idea
 /.vscode
