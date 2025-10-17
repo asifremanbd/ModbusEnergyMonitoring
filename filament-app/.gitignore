@@ -59,3 +59,10 @@ Thumbs.db
 
 # Ignore hidden local folders
 .kiro/
+
+# Server configuration and credentials (SECURITY)
+*.service
+*.timer
+*.conf
+server-credentials.*
+nginx-config.*
