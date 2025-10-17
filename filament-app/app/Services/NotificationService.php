@@ -124,17 +124,17 @@ class NotificationService
     {
         if ($success) {
             $message = match ($operation) {
-                'pause' => "Gateway '{$gatewayName}' has been paused. Polling will stop until resumed.",
-                'resume' => "Gateway '{$gatewayName}' has been resumed. Polling will start shortly.",
-                'delete' => "Gateway '{$gatewayName}' and all its data have been deleted.",
-                'create' => "Gateway '{$gatewayName}' has been created successfully.",
-                'update' => "Gateway '{$gatewayName}' configuration has been updated.",
-                default => "Operation completed for gateway '{$gatewayName}'.",
+                'pause' => "Modbus registration '{$gatewayName}' has been paused. Polling will stop until resumed.",
+                'resume' => "Modbus registration '{$gatewayName}' has been resumed. Polling will start shortly.",
+                'delete' => "Modbus registration '{$gatewayName}' and all its data have been deleted.",
+                'create' => "Modbus registration '{$gatewayName}' has been created successfully.",
+                'update' => "Modbus registration '{$gatewayName}' configuration has been updated.",
+                default => "Operation completed for Modbus registration '{$gatewayName}'.",
             };
             
             $this->success($message, $undoAction);
         } else {
-            $message = "Failed to {$operation} gateway '{$gatewayName}'. Please try again.";
+            $message = "Failed to {$operation} Modbus registration '{$gatewayName}'. Please try again.";
             $this->error($message);
         }
     }
@@ -146,9 +146,9 @@ class NotificationService
     {
         if ($successCount === $totalCount) {
             $message = match ($operation) {
-                'pause' => "Successfully paused {$successCount} gateways.",
-                'resume' => "Successfully resumed {$successCount} gateways.",
-                'delete' => "Successfully deleted {$successCount} gateways.",
+                'pause' => "Successfully paused {$successCount} registrations.",
+                'resume' => "Successfully resumed {$successCount} registrations.",
+                'delete' => "Successfully deleted {$successCount} registrations.",
                 'enable' => "Successfully enabled {$successCount} data points.",
                 'disable' => "Successfully disabled {$successCount} data points.",
                 default => "Successfully processed {$successCount} items.",

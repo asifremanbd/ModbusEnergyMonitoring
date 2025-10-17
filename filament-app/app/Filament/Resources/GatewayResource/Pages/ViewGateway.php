@@ -55,10 +55,10 @@ class ViewGateway extends ViewRecord
                     
                     if ($this->record->is_active) {
                         $service->pausePolling($this->record);
-                        $message = 'Gateway polling paused';
+                        $message = 'Registration polling paused';
                     } else {
                         $service->resumePolling($this->record);
-                        $message = 'Gateway polling resumed';
+                        $message = 'Registration polling resumed';
                     }
                     
                     $this->record->refresh();
@@ -103,10 +103,10 @@ class ViewGateway extends ViewRecord
     {
         return $infolist
             ->schema([
-                Infolists\Components\Section::make('Gateway Information')
+                Infolists\Components\Section::make('Modbus Registration Information')
                     ->schema([
                         Infolists\Components\TextEntry::make('name')
-                            ->label('Gateway Name'),
+                            ->label('Registration Name'),
                         
                         Infolists\Components\TextEntry::make('ip_address')
                             ->label('IP Address'),

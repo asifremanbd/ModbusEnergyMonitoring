@@ -29,13 +29,13 @@ class GatewaysOverview extends BaseWidget
             $lastSyncFormatted = $lastSync ? $lastSync->diffForHumans() : 'Never';
             
             return [
-                Stat::make('Online Gateways', $online)
+                Stat::make('Online Registrations', $online)
                     ->description('Currently connected')
                     ->descriptionIcon('heroicon-m-arrow-trending-up')
                     ->color('success')
                     ->icon('heroicon-m-signal'),
                     
-                Stat::make('Offline Gateways', $offline)
+                Stat::make('Offline Registrations', $offline)
                     ->description('Not responding')
                     ->descriptionIcon('heroicon-m-arrow-trending-down')
                     ->color($offline > 0 ? 'danger' : 'gray')

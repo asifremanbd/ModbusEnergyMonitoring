@@ -16,7 +16,7 @@ class ListGateways extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Add Gateway')
+                ->label('Add Modbus Registration')
                 ->icon('heroicon-o-plus'),
         ];
     }

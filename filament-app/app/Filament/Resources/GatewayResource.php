@@ -26,32 +26,32 @@ class GatewayResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
 
-    protected static ?string $navigationLabel = 'Gateways';
+    protected static ?string $navigationLabel = 'Modbus Registrations';
 
-    protected static ?string $modelLabel = 'Gateway';
+    protected static ?string $modelLabel = 'Modbus Registration';
 
-    protected static ?string $pluralModelLabel = 'Gateways';
+    protected static ?string $pluralModelLabel = 'Modbus Registrations';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Gateway Configuration')
-                    ->description('Essential gateway settings for quick setup')
+                Forms\Components\Section::make('Modbus Registration Configuration')
+                    ->description('Essential Modbus registration settings for quick setup')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Enter unique gateway name')
-                            ->helperText('Descriptive name to identify this gateway'),
+                            ->placeholder('Enter unique registration name')
+                            ->helperText('Descriptive name to identify this Modbus registration'),
                         
                         Forms\Components\TextInput::make('ip_address')
                             ->label('IP Address')
                             ->required()
                             ->ip()
                             ->placeholder('192.168.1.100')
-                            ->helperText('Static or public IP of the Teltonika gateway'),
+                            ->helperText('Static or public IP of the Teltonika device'),
                         
                         Forms\Components\TextInput::make('port')
                             ->label('Port')
@@ -86,7 +86,7 @@ class GatewayResource extends Resource
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
                             ->default(true)
-                            ->helperText('Enable polling for this gateway (default ON)'),
+                            ->helperText('Enable polling for this registration (default ON)'),
                     ])
                     ->columns(2)
                     ->compact(),
@@ -172,7 +172,7 @@ class GatewayResource extends Resource
                     ->button()
                     ->color('warning')
                     ->extraAttributes([
-                        'aria-label' => 'Test gateway connection',
+                        'aria-label' => 'Test registration connection',
                         'role' => 'button',
                         'tabindex' => '0',
                     ])
@@ -201,8 +201,8 @@ class GatewayResource extends Resource
                         }
                     })
                     ->requiresConfirmation()
-                    ->modalHeading('Test Gateway Connection')
-                    ->modalDescription('This will attempt to connect to the gateway and read a test register.')
+                    ->modalHeading('Test Registration Connection')
+                    ->modalDescription('This will attempt to connect to the device and read a test register.')
                     ->modalSubmitActionLabel('Test Connection'),
                 
                 Action::make('pause')
@@ -212,7 +212,7 @@ class GatewayResource extends Resource
                     ->button()
                     ->color('warning')
                     ->extraAttributes([
-                        'aria-label' => 'Pause gateway polling',
+                        'aria-label' => 'Pause registration polling',
                         'role' => 'button',
                         'tabindex' => '0',
                     ])
@@ -236,8 +236,8 @@ class GatewayResource extends Resource
                     })
                     ->visible(fn (Gateway $record): bool => $record->is_active)
                     ->requiresConfirmation()
-                    ->modalHeading('Pause Gateway Polling')
-                    ->modalDescription('This will stop polling this gateway until you restart it.')
+                    ->modalHeading('Pause Registration Polling')
+                    ->modalDescription('This will stop polling this registration until you restart it.')
                     ->modalSubmitActionLabel('Pause Polling'),
                 
                 Action::make('resume')
@@ -247,7 +247,7 @@ class GatewayResource extends Resource
                     ->button()
                     ->color('success')
                     ->extraAttributes([
-                        'aria-label' => 'Resume gateway polling',
+                        'aria-label' => 'Resume registration polling',
                         'role' => 'button',
                         'tabindex' => '0',
                     ])
@@ -271,8 +271,8 @@ class GatewayResource extends Resource
                     })
                     ->visible(fn (Gateway $record): bool => !$record->is_active)
                     ->requiresConfirmation()
-                    ->modalHeading('Resume Gateway Polling')
-                    ->modalDescription('This will resume polling for this gateway.')
+                    ->modalHeading('Resume Registration Polling')
+                    ->modalDescription('This will resume polling for this registration.')
                     ->modalSubmitActionLabel('Resume Polling'),
                 
                 Tables\Actions\EditAction::make()
@@ -281,7 +281,7 @@ class GatewayResource extends Resource
                     ->label(null)
                     ->button()
                     ->extraAttributes([
-                        'aria-label' => 'Edit gateway',
+                        'aria-label' => 'Edit registration',
                         'role' => 'button',
                         'tabindex' => '0',
                     ])
@@ -293,7 +293,7 @@ class GatewayResource extends Resource
                     ->label(null)
                     ->button()
                     ->extraAttributes([
-                        'aria-label' => 'Delete gateway',
+                        'aria-label' => 'Delete registration',
                         'role' => 'button',
                         'tabindex' => '0',
                     ])

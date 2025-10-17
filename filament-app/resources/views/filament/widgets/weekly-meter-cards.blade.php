@@ -1,102 +1,102 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <x-slot name="heading">
-            Weekly Usage Cards
+            Usage Cards
         </x-slot>
 
         @if($this->getViewData()['hasData'])
-            <x-filament::grid default="1" md="2" xl="4" class="gap-4">
+            <div class="flex flex-row gap-4 overflow-x-auto">
                 @foreach($this->getViewData()['devices'] as $device)
                     @php
-                        $heroicons = [
-                            'power' => 'heroicon-m-bolt',
-                            'water' => 'heroicon-m-beaker',
-                            'socket' => 'heroicon-m-power',
-                            'radiator' => 'heroicon-m-fire',
-                            'fan' => 'heroicon-m-arrow-path',
-                            'faucet' => 'heroicon-m-beaker',
-                            'ac' => 'heroicon-m-cpu-chip',
-                            'other' => 'heroicon-m-chart-bar',
+                        $iconMap = [
+                            'power' => 'power-meter.png',
+                            'water' => 'water-meter.png',
+                            'socket' => 'supply.png',
+                            'radiator' => 'radiator.png',
+                            'fan' => 'fan.png',
+                            'faucet' => 'faucet.png',
+                            'ac' => 'fan.png', // Using fan icon for AC as it's similar
+                            'other' => 'statistics.png',
                         ];
                         
-                        $colors = [
-                            'power' => 'warning',
-                            'water' => 'info',
-                            'socket' => 'primary',
-                            'radiator' => 'danger',
-                            'fan' => 'success',
-                            'faucet' => 'info',
-                            'ac' => 'primary',
-                            'other' => 'gray',
-                        ];
+                        $iconFile = $iconMap[$device['load_type']] ?? $iconMap['other'];
                         
-                        $chartColors = [
-                            'power' => 'rgba(234, 179, 8, 0.8)',
-                            'water' => 'rgba(59, 130, 246, 0.8)',
-                            'socket' => 'rgba(147, 51, 234, 0.8)',
-                            'radiator' => 'rgba(239, 68, 68, 0.8)',
-                            'fan' => 'rgba(20, 184, 166, 0.8)',
-                            'faucet' => 'rgba(14, 165, 233, 0.8)',
-                            'ac' => 'rgba(99, 102, 241, 0.8)',
-                            'other' => 'rgba(107, 114, 128, 0.8)',
-                        ];
-                        
-                        $heroicon = $heroicons[$device['load_type']] ?? $heroicons['other'];
-                        $color = $colors[$device['load_type']] ?? $colors['other'];
-                        $chartColor = $chartColors[$device['load_type']] ?? $chartColors['other'];
+                        // Determine if we should show amps (for electrical devices)
+                        $showAmps = in_array($device['load_type'], ['power', 'socket', 'ac']) && $device['unit'] === 'kWh';
+                        $ampsValue = $showAmps ? round($device['current_value'] * 4.35, 1) : null; // Rough conversion for display
                     @endphp
                     
-                    <x-filament::card class="shadow-sm hover:shadow-md transition-shadow duration-200 dark:bg-gray-800">
-                        <!-- Header with Device Name and Icon -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex-1">
-                                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wide">
-                                    {{ $device['label'] }}
-                                </h3>
-                            </div>
-                            <div class="ml-3">
-                                <x-filament::icon 
-                                    :icon="$heroicon"
-                                    class="w-6 h-6 text-{{ $color }}-500 dark:text-{{ $color }}-400"
-                                />
-                            </div>
+                    <div class="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex-1 min-w-0">
+                        <!-- Large Background Icon -->
+                        <div class="absolute top-2 right-2 opacity-25 dark:opacity-20 z-0" style="right: 8px; top: 8px;">
+                            <img 
+                                src="{{ asset('images/icons/' . $iconFile) }}" 
+                                alt="{{ $device['label'] }} icon"
+                                class="w-20 h-20 object-contain"
+                            />
                         </div>
                         
-                        <!-- Weekly Total -->
-                        <div class="mb-2">
-                            <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-none">
+                        <!-- Title -->
+                        <div class="relative z-10 mb-2">
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                {{ $device['label'] }}
+                            </h3>
+                        </div>
+                        
+                        <!-- Big Total Value -->
+                        <div class="relative z-10 mb-4">
+                            <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 {{ number_format($device['total_usage'], 1) }}
-                                <span class="text-lg font-medium text-gray-600 dark:text-gray-400 ml-1">{{ $device['unit'] }}</span>
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400 ml-1">{{ $device['unit'] }}</span>
                             </div>
                         </div>
                         
-                        <!-- Daily Average -->
-                        <div class="text-sm text-gray-600 dark:text-gray-400 font-medium mb-4">
-                            Daily avg: {{ number_format($device['daily_average'], 1) }} {{ $device['unit'] }}/day
-                        </div>
-                        
-                        <!-- Status Indicator -->
-                        <div class="flex items-center justify-center">
-                            @if($device['status'] === 'current')
-                                <div class="flex items-center text-green-600 dark:text-green-400">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                                    <span class="text-xs font-medium">Live Data</span>
-                                </div>
-                            @elseif($device['status'] === 'recent')
-                                <div class="flex items-center text-blue-600 dark:text-blue-400">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                                    <span class="text-xs font-medium">Recent Data</span>
-                                </div>
-                            @else
-                                <div class="flex items-center text-amber-600 dark:text-amber-400">
-                                    <div class="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
-                                    <span class="text-xs font-medium">Historical Data</span>
-                                </div>
+                        <!-- Metrics Rows -->
+                        <div class="relative z-10 space-y-2 mb-4">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500 dark:text-gray-400">Today</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                    {{ number_format($device['today_usage'], 1) }} {{ $device['unit'] }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500 dark:text-gray-400">Weekly Total</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                    {{ number_format($device['weekly_total'], 1) }} {{ $device['unit'] }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500 dark:text-gray-400">Weekly Avg</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                    {{ number_format($device['weekly_average'], 1) }} {{ $device['unit'] }}
+                                </span>
+                            </div>
+                            
+                            @if($showAmps && $ampsValue)
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500 dark:text-gray-400">Amps</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $ampsValue }} A
+                                </span>
+                            </div>
                             @endif
                         </div>
-                    </x-filament::card>
+                        
+                        <!-- Last Updated Footer -->
+                        <div class="relative z-10 pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <div class="text-xs text-gray-400 dark:text-gray-500">
+                                @if($device['last_reading_date'])
+                                    {{ $device['last_reading_date']->diffForHumans() }}
+                                @else
+                                    No recent data
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 @endforeach
-            </x-filament::grid>
+            </div>
         @else
             <div class="text-center py-12">
                 <x-filament::icon 
@@ -108,5 +108,4 @@
             </div>
         @endif
     </x-filament::section>
-
 </x-filament-widgets::widget>
