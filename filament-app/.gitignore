@@ -49,3 +49,6 @@ Thumbs.db
 /.fleet
 /.idea
 /.vscode
+
+# Kiro development specs (keep local only)
+/.kiro/specs/
